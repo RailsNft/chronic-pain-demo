@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>Pain Companion — Chronic Pain & Illness Journal App (DEMO)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -636,14 +634,14 @@ textarea:focus,input[type=text]:focus,select:focus{
 <div class="toast-wrap" id="toast"><div class="toast" id="toast-msg"></div></div>
 
 <!-- ── DEMO: Floating CTA ── -->
-<a class="demo-fab" href="#" id="demo-fab">Get Full Version</a>
+<a class="demo-fab" href="https://www.etsy.com/fr/listing/4473113547/chronic-pain-tracker-app-daily-pain-log" target="_blank" id="demo-fab">Get Full Version</a>
 
 <!-- ── DEMO: Limit Modal ── -->
 <div class="demo-modal-bg" id="demo-limit-modal">
   <div class="demo-modal">
     <h3>Demo Limit Reached</h3>
     <p>You've explored the key features! The full Chronic Pain Journal includes unlimited logging, doctor reports, data export, and more.</p>
-    <a href="#" class="btn btn-pri" style="text-decoration:none;justify-content:center">Get the Full Chronic Pain Journal on Etsy</a>
+    <a href="https://www.etsy.com/fr/listing/4473113547/chronic-pain-tracker-app-daily-pain-log" target="_blank" class="btn btn-pri" style="text-decoration:none;justify-content:center">Get the Full Chronic Pain Journal on Etsy</a>
     <button class="btn btn-ghost" onclick="document.getElementById('demo-limit-modal').classList.remove('active')" style="width:100%">Continue Exploring</button>
   </div>
 </div>
@@ -653,522 +651,453 @@ textarea:focus,input[type=text]:focus,select:focus{
   <div class="demo-modal">
     <h3>Available in Full Version</h3>
     <p>The Doctor Report feature generates a printable summary of your pain data for medical appointments. It's available in the full version.</p>
-    <a href="#" class="btn btn-gold" style="text-decoration:none;justify-content:center">Get Full Version on Etsy</a>
+    <a href="https://www.etsy.com/fr/listing/4473113547/chronic-pain-tracker-app-daily-pain-log" target="_blank" class="btn btn-gold" style="text-decoration:none;justify-content:center">Get Full Version on Etsy</a>
     <button class="btn btn-ghost" onclick="document.getElementById('demo-doctor-modal').classList.remove('active')" style="width:100%">Close</button>
   </div>
 </div>
 
 <script>
 'use strict';
-
-// ── STATE ─────────────────────────────────────────────────────
 const KEY = 'pain_companion_v1';
 const NOW = new Date();
 const TODAY = NOW.toISOString().slice(0,10);
-
 let S = {
-  currentPain: 5,
-  spoons: 10,
-  spoonsUsed: 0,
-  logs: {},          // date → {pain, sleep, energy, mood, stress, areas, triggers, notes, meds, flare}
-  meds: [],
-  streak: 0,
-  lastLogDate: null,
+currentPain: 5,
+spoons: 10,
+spoonsUsed: 0,
+logs: {},          // date → {pain, sleep, energy, mood, stress, areas, triggers, notes, meds, flare}
+meds: [],
+streak: 0,
+lastLogDate: null,
 };
-
 const AREAS = [
-  'Head','Neck','Left Shoulder','Right Shoulder','Upper Back','Lower Back',
-  'Chest','Abdomen','Left Hip','Right Hip','Left Knee','Right Knee',
-  'Left Foot','Right Foot','Left Hand','Right Hand','Widespread'
+'Head','Neck','Left Shoulder','Right Shoulder','Upper Back','Lower Back',
+'Chest','Abdomen','Left Hip','Right Hip','Left Knee','Right Knee',
+'Left Foot','Right Foot','Left Hand','Right Hand','Widespread'
 ];
-
 const TRIGGERS = [
-  'Weather change','Overactivity','Poor sleep','Stress / anxiety',
-  'Hormonal','Food / diet','Dehydration','Screen time',
-  'Emotional strain','Travel','Cold temperature','Bright light',
-  'Standing too long','Unknown'
+'Weather change','Overactivity','Poor sleep','Stress / anxiety',
+'Hormonal','Food / diet','Dehydration','Screen time',
+'Emotional strain','Travel','Cold temperature','Bright light',
+'Standing too long','Unknown'
 ];
-
 const PAIN_LABELS = ['','Minimal','Mild','Uncomfortable','Moderate','Distracting',
-  'Distressing','Intense','Severe','Unbearable','Worst possible'];
+'Distressing','Intense','Severe','Unbearable','Worst possible'];
 const PAIN_DESCS  = ['','Barely noticeable','Present but manageable','Noticeable, affects tasks',
-  'Noticeably painful','Hard to focus','Affects all activities','Limits normal function',
-  'Debilitating pain','Near unable to function','Worst pain imaginable'];
-
+'Noticeably painful','Hard to focus','Affects all activities','Limits normal function',
+'Debilitating pain','Near unable to function','Worst pain imaginable'];
 let selectedAreas = new Set();
 let selectedTrigs = new Set();
 let hmYear = NOW.getFullYear();
 let hmMonth = NOW.getMonth();
-
-// ── LOAD/SAVE (DEMO: no-ops) ─────────────────────────────────
 let _demoSaveCount = 0;
 const DEMO_MAX_SAVES = 3;
 function load(){}
 function save(){
-  _demoSaveCount++;
-  if(_demoSaveCount >= DEMO_MAX_SAVES){
-    document.getElementById('demo-limit-modal').classList.add('active');
-  }
+_demoSaveCount++;
+if(_demoSaveCount >= DEMO_MAX_SAVES){
+document.getElementById('demo-limit-modal').classList.add('active');
 }
-
-// ── PAIN BAR ─────────────────────────────────────────────────
+}
 function buildPainBar(){
-  const el=document.getElementById('pain-bar');
-  el.innerHTML='';
-  for(let i=1;i<=10;i++){
-    const s=document.createElement('div');
-    s.className=`pb-seg s${i}${i<=S.currentPain?' active':''}`;
-    s.style.height=i<=S.currentPain?`${i*3+10}px`:'10px';
-    s.onclick=()=>setPain(i);
-    el.appendChild(s);
-  }
-  document.getElementById('pain-display').textContent=S.currentPain;
-  document.getElementById('pain-label').textContent=PAIN_LABELS[S.currentPain]||'';
-  document.getElementById('pain-desc').textContent=PAIN_DESCS[S.currentPain]||'';
+const el=document.getElementById('pain-bar');
+el.innerHTML='';
+for(let i=1;i<=10;i++){
+const s=document.createElement('div');
+s.className=`pb-seg s${i}${i<=S.currentPain?' active':''}`;
+s.style.height=i<=S.currentPain?`${i*3+10}px`:'10px';
+s.onclick=()=>setPain(i);
+el.appendChild(s);
+}
+document.getElementById('pain-display').textContent=S.currentPain;
+document.getElementById('pain-label').textContent=PAIN_LABELS[S.currentPain]||'';
+document.getElementById('pain-desc').textContent=PAIN_DESCS[S.currentPain]||'';
 }
 function setPain(v){S.currentPain=v;buildPainBar();}
-
-// ── SLIDERS ──────────────────────────────────────────────────
 function updateSlider(inp,id,varName){
-  const v=document.getElementById(id);
-  v.textContent=inp.value;
-  v.style.color=`var(--${varName})`;
+const v=document.getElementById(id);
+v.textContent=inp.value;
+v.style.color=`var(--${varName})`;
 }
-
-// ── SPOONS ───────────────────────────────────────────────────
 function buildSpoons(){
-  const el=document.getElementById('spoon-grid');
-  el.innerHTML='';
-  for(let i=0;i<S.spoons+S.spoonsUsed;i++){
-    const sp=document.createElement('div');
-    sp.className=`spoon${i>=S.spoons?' used':''}`;
-    sp.textContent='🥄';
-    sp.onclick=()=>toggleSpoon(i);
-    el.appendChild(sp);
-  }
-  document.getElementById('spoons-available').textContent=S.spoons;
-  document.getElementById('spoons-used').textContent=S.spoonsUsed;
-  document.getElementById('spoon-display').textContent=S.spoons;
-  document.getElementById('spoons-left').textContent=S.spoons;
+const el=document.getElementById('spoon-grid');
+el.innerHTML='';
+for(let i=0;i<S.spoons+S.spoonsUsed;i++){
+const sp=document.createElement('div');
+sp.className=`spoon${i>=S.spoons?' used':''}`;
+sp.textContent='🥄';
+sp.onclick=()=>toggleSpoon(i);
+el.appendChild(sp);
+}
+document.getElementById('spoons-available').textContent=S.spoons;
+document.getElementById('spoons-used').textContent=S.spoonsUsed;
+document.getElementById('spoon-display').textContent=S.spoons;
+document.getElementById('spoons-left').textContent=S.spoons;
 }
 function toggleSpoon(i){
-  const total=S.spoons+S.spoonsUsed;
-  if(i<S.spoons){S.spoons--;S.spoonsUsed++;}
-  else{S.spoons++;S.spoonsUsed--;}
-  buildSpoons();
+const total=S.spoons+S.spoonsUsed;
+if(i<S.spoons){S.spoons--;S.spoonsUsed++;}
+else{S.spoons++;S.spoonsUsed--;}
+buildSpoons();
 }
-
-// ── AREA GRID ────────────────────────────────────────────────
 function buildAreaGrid(){
-  const el=document.getElementById('area-grid');
-  el.innerHTML=AREAS.map(a=>
-    `<div class="area-chip${selectedAreas.has(a)?' active':''}" onclick="toggleArea('${a}')">${a}</div>`
-  ).join('');
+const el=document.getElementById('area-grid');
+el.innerHTML=AREAS.map(a=>
+`<div class="area-chip${selectedAreas.has(a)?' active':''}" onclick="toggleArea('${a}')">${a}</div>`
+).join('');
 }
 function toggleArea(a){
-  if(selectedAreas.has(a))selectedAreas.delete(a);
-  else selectedAreas.add(a);
-  buildAreaGrid();
+if(selectedAreas.has(a))selectedAreas.delete(a);
+else selectedAreas.add(a);
+buildAreaGrid();
 }
-
-// ── TRIGGER GRID ─────────────────────────────────────────────
 function buildTrigGrid(){
-  const el=document.getElementById('trig-grid');
-  el.innerHTML=TRIGGERS.map(t=>
-    `<div class="trig-chip${selectedTrigs.has(t)?' active':''}" onclick="toggleTrig('${t}')">${t}</div>`
-  ).join('');
+const el=document.getElementById('trig-grid');
+el.innerHTML=TRIGGERS.map(t=>
+`<div class="trig-chip${selectedTrigs.has(t)?' active':''}" onclick="toggleTrig('${t}')">${t}</div>`
+).join('');
 }
 function toggleTrig(t){
-  if(selectedTrigs.has(t))selectedTrigs.delete(t);
-  else selectedTrigs.add(t);
-  buildTrigGrid();
+if(selectedTrigs.has(t))selectedTrigs.delete(t);
+else selectedTrigs.add(t);
+buildTrigGrid();
 }
-
-// ── LOG ──────────────────────────────────────────────────────
 function saveLog(){
-  const log={
-    pain:S.currentPain,
-    sleep:+document.getElementById('sl-sleep').value,
-    energy:+document.getElementById('sl-energy').value,
-    mood:+document.getElementById('sl-mood').value,
-    stress:+document.getElementById('sl-stress').value,
-    areas:[...selectedAreas],
-    triggers:[...selectedTrigs],
-    notes:document.getElementById('log-notes').value,
-    spoons:S.spoons,
-    spoonsUsed:S.spoonsUsed,
-    flare:false,
-    ts:Date.now()
-  };
-  S.logs[TODAY]=log;
-  checkStreak();
-  save();
-  renderRecentLogs();
-  renderInsights();
-  renderHeatMap();
-  showToast('✓ Pain log saved');
+const log={
+pain:S.currentPain,
+sleep:+document.getElementById('sl-sleep').value,
+energy:+document.getElementById('sl-energy').value,
+mood:+document.getElementById('sl-mood').value,
+stress:+document.getElementById('sl-stress').value,
+areas:[...selectedAreas],
+triggers:[...selectedTrigs],
+notes:document.getElementById('log-notes').value,
+spoons:S.spoons,
+spoonsUsed:S.spoonsUsed,
+flare:false,
+ts:Date.now()
+};
+S.logs[TODAY]=log;
+checkStreak();
+save();
+renderRecentLogs();
+renderInsights();
+renderHeatMap();
+showToast('✓ Pain log saved');
 }
-
 function clearToday(){
-  selectedAreas.clear();selectedTrigs.clear();
-  buildAreaGrid();buildTrigGrid();
-  document.getElementById('log-notes').value='';
+selectedAreas.clear();selectedTrigs.clear();
+buildAreaGrid();buildTrigGrid();
+document.getElementById('log-notes').value='';
 }
-
 function logFlare(){
-  if(S.logs[TODAY])S.logs[TODAY].flare=true;
-  else S.logs[TODAY]={pain:S.currentPain,flare:true,ts:Date.now()};
-  save();renderHeatMap();showToast('Flare logged');
+if(S.logs[TODAY])S.logs[TODAY].flare=true;
+else S.logs[TODAY]={pain:S.currentPain,flare:true,ts:Date.now()};
+save();renderHeatMap();showToast('Flare logged');
 }
-
 function renderRecentLogs(){
-  const el=document.getElementById('recent-logs');
-  const dates=Object.keys(S.logs).sort((a,b)=>b.localeCompare(a)).slice(0,7);
-  if(!dates.length){el.innerHTML='<div class="empty">No logs yet.<br>Log your first day above.</div>';return;}
-  el.innerHTML=dates.map(d=>{
-    const l=S.logs[d];
-    const painCol=l.pain<=3?'var(--gr)':l.pain<=6?'var(--am)':'var(--rd)';
-    return `<div class="log-item">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:${painCol}">${l.pain||'—'}</div>
-        <div>
-          <div style="font-size:12px;font-weight:500;color:var(--ink)">${d===TODAY?'Today':d}</div>
-          <div style="font-size:10px;color:var(--ink4)">${l.flare?'🚨 Flare ':''}😴${l.sleep||'?'}h ⚡${l.energy||'?'}/10 😟${l.mood||'?'}/10</div>
-        </div>
-        ${l.flare?'<div style="margin-left:auto;padding:3px 10px;border-radius:12px;background:var(--rd-s);border:1px solid var(--rd);font-size:9px;font-weight:600;color:var(--rd)">FLARE</div>':''}
-      </div>
-      ${l.areas&&l.areas.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${l.areas.map(a=>`<span style="font-size:9px;padding:2px 8px;border-radius:12px;background:var(--rd-s);color:var(--rd);border:1px solid rgba(184,84,84,.2)">${a}</span>`).join('')}</div>`:''}
-      ${l.notes?`<div style="font-size:11px;color:var(--ink3);margin-top:6px;font-style:italic">${l.notes.slice(0,80)}${l.notes.length>80?'…':''}</div>`:''}
-    </div>`;
-  }).join('');
+const el=document.getElementById('recent-logs');
+const dates=Object.keys(S.logs).sort((a,b)=>b.localeCompare(a)).slice(0,7);
+if(!dates.length){el.innerHTML='<div class="empty">No logs yet.<br>Log your first day above.</div>';return;}
+el.innerHTML=dates.map(d=>{
+const l=S.logs[d];
+const painCol=l.pain<=3?'var(--gr)':l.pain<=6?'var(--am)':'var(--rd)';
+return `<div class="log-item">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+<div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:${painCol}">${l.pain||'—'}</div>
+<div>
+<div style="font-size:12px;font-weight:500;color:var(--ink)">${d===TODAY?'Today':d}</div>
+<div style="font-size:10px;color:var(--ink4)">${l.flare?'🚨 Flare ':''}😴${l.sleep||'?'}h ⚡${l.energy||'?'}/10 😟${l.mood||'?'}/10</div>
+</div>
+${l.flare?'<div style="margin-left:auto;padding:3px 10px;border-radius:12px;background:var(--rd-s);border:1px solid var(--rd);font-size:9px;font-weight:600;color:var(--rd)">FLARE</div>':''}
+</div>
+${l.areas&&l.areas.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${l.areas.map(a=>`<span style="font-size:9px;padding:2px 8px;border-radius:12px;background:var(--rd-s);color:var(--rd);border:1px solid rgba(184,84,84,.2)">${a}</span>`).join('')}</div>`:''}
+${l.notes?`<div style="font-size:11px;color:var(--ink3);margin-top:6px;font-style:italic">${l.notes.slice(0,80)}${l.notes.length>80?'…':''}</div>`:''}
+</div>`;
+}).join('');
 }
-
-// ── STREAK ───────────────────────────────────────────────────
 function checkStreak(){
-  const yst=new Date(NOW);yst.setDate(yst.getDate()-1);
-  const yStr=yst.toISOString().slice(0,10);
-  if(S.lastLogDate===yStr)S.streak++;
-  else if(S.lastLogDate!==TODAY)S.streak=1;
-  S.lastLogDate=TODAY;
-  document.getElementById('streak-num').textContent=S.streak;
+const yst=new Date(NOW);yst.setDate(yst.getDate()-1);
+const yStr=yst.toISOString().slice(0,10);
+if(S.lastLogDate===yStr)S.streak++;
+else if(S.lastLogDate!==TODAY)S.streak=1;
+S.lastLogDate=TODAY;
+document.getElementById('streak-num').textContent=S.streak;
 }
-
-// ── HEAT MAP ─────────────────────────────────────────────────
 function changeMonth(dir){
-  hmMonth+=dir;
-  if(hmMonth<0){hmMonth=11;hmYear--;}
-  if(hmMonth>11){hmMonth=0;hmYear++;}
-  renderHeatMap();
+hmMonth+=dir;
+if(hmMonth<0){hmMonth=11;hmYear--;}
+if(hmMonth>11){hmMonth=0;hmYear++;}
+renderHeatMap();
 }
-
 function renderHeatMap(){
-  const months=['January','February','March','April','May','June',
-    'July','August','September','October','November','December'];
-  document.getElementById('hm-month-label').textContent=`${months[hmMonth]} ${hmYear}`;
-
-  const firstDay=new Date(hmYear,hmMonth,1).getDay();
-  const offset=(firstDay===0?6:firstDay-1);
-  const daysInMonth=new Date(hmYear,hmMonth+1,0).getDate();
-
-  const el=document.getElementById('hm-grid');
-  el.innerHTML='';
-
-  let good=0,mod=0,bad=0,flares=0,total=0,count=0;
-
-  for(let i=0;i<offset;i++){
-    const empty=document.createElement('div');empty.style.height='0';el.appendChild(empty);
-  }
-
-  for(let d=1;d<=daysInMonth;d++){
-    const dateStr=`${hmYear}-${String(hmMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const log=S.logs[dateStr];
-    const cell=document.createElement('div');
-    cell.className='hm-day';
-    cell.title=dateStr;
-    const isToday=dateStr===TODAY;
-    if(isToday)cell.style.fontWeight='700';
-
-    if(log){
-      const p=log.pain;
-      const cl=p<=3?'p1':p<=6?'p2':'p3';
-      cell.classList.add(cl);
-      if(log.flare)cell.classList.add('flare');
-      cell.innerHTML=`<div class="hm-val">${p}</div><div class="hm-n">${d}</div>`;
-      if(p<=3)good++;else if(p<=6)mod++;else bad++;
-      if(log.flare)flares++;
-      total+=p;count++;
-    }else{
-      cell.classList.add('p0');
-      cell.innerHTML=`<div class="hm-n" style="font-size:10px">${d}</div>`;
-    }
-    el.appendChild(cell);
-  }
-
-  document.getElementById('hm-good').textContent=good;
-  document.getElementById('hm-mod').textContent=mod;
-  document.getElementById('hm-bad').textContent=bad;
-  document.getElementById('hm-flares').textContent=flares;
-  document.getElementById('hm-avg').textContent=count?(total/count).toFixed(1):'--';
+const months=['January','February','March','April','May','June',
+'July','August','September','October','November','December'];
+document.getElementById('hm-month-label').textContent=`${months[hmMonth]} ${hmYear}`;
+const firstDay=new Date(hmYear,hmMonth,1).getDay();
+const offset=(firstDay===0?6:firstDay-1);
+const daysInMonth=new Date(hmYear,hmMonth+1,0).getDate();
+const el=document.getElementById('hm-grid');
+el.innerHTML='';
+let good=0,mod=0,bad=0,flares=0,total=0,count=0;
+for(let i=0;i<offset;i++){
+const empty=document.createElement('div');empty.style.height='0';el.appendChild(empty);
 }
-
-// ── MEDS ─────────────────────────────────────────────────────
+for(let d=1;d<=daysInMonth;d++){
+const dateStr=`${hmYear}-${String(hmMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const log=S.logs[dateStr];
+const cell=document.createElement('div');
+cell.className='hm-day';
+cell.title=dateStr;
+const isToday=dateStr===TODAY;
+if(isToday)cell.style.fontWeight='700';
+if(log){
+const p=log.pain;
+const cl=p<=3?'p1':p<=6?'p2':'p3';
+cell.classList.add(cl);
+if(log.flare)cell.classList.add('flare');
+cell.innerHTML=`<div class="hm-val">${p}</div><div class="hm-n">${d}</div>`;
+if(p<=3)good++;else if(p<=6)mod++;else bad++;
+if(log.flare)flares++;
+total+=p;count++;
+}else{
+cell.classList.add('p0');
+cell.innerHTML=`<div class="hm-n" style="font-size:10px">${d}</div>`;
+}
+el.appendChild(cell);
+}
+document.getElementById('hm-good').textContent=good;
+document.getElementById('hm-mod').textContent=mod;
+document.getElementById('hm-bad').textContent=bad;
+document.getElementById('hm-flares').textContent=flares;
+document.getElementById('hm-avg').textContent=count?(total/count).toFixed(1):'--';
+}
 function addMed(){
-  const name=document.getElementById('med-name').value.trim();
-  const time=document.getElementById('med-time').value.trim();
-  const type=document.getElementById('med-type').value;
-  if(!name)return;
-  S.meds.push({id:Date.now()+'',name,time,type,takenDates:[]});
-  save();document.getElementById('med-name').value='';renderMeds();
+const name=document.getElementById('med-name').value.trim();
+const time=document.getElementById('med-time').value.trim();
+const type=document.getElementById('med-type').value;
+if(!name)return;
+S.meds.push({id:Date.now()+'',name,time,type,takenDates:[]});
+save();document.getElementById('med-name').value='';renderMeds();
 }
 function renderMeds(){
-  const el=document.getElementById('med-list');
-  if(!S.meds.length){
-    el.innerHTML='<div class="insight gr"><div class="ii">💊</div><div>No medications added. Use the form below to add your daily medications.</div></div>';return;
-  }
-  el.innerHTML=S.meds.map(m=>{
-    const taken=m.takenDates&&m.takenDates.includes(TODAY);
-    return `<div class="med-item${taken?' taken':''}" onclick="toggleMed('${m.id}')">
-      <div class="med-dot">${taken?'✓':''}</div>
-      <div>
-        <div class="med-name">${m.name}</div>
-        <div class="med-time">${m.time}${m.time?' · ':''}${m.type}</div>
-      </div>
-      <button class="btn-del" onclick="event.stopPropagation();deleteMed('${m.id}')">✕</button>
-    </div>`;
-  }).join('');
+const el=document.getElementById('med-list');
+if(!S.meds.length){
+el.innerHTML='<div class="insight gr"><div class="ii">💊</div><div>No medications added. Use the form below to add your daily medications.</div></div>';return;
+}
+el.innerHTML=S.meds.map(m=>{
+const taken=m.takenDates&&m.takenDates.includes(TODAY);
+return `<div class="med-item${taken?' taken':''}" onclick="toggleMed('${m.id}')">
+<div class="med-dot">${taken?'✓':''}</div>
+<div>
+<div class="med-name">${m.name}</div>
+<div class="med-time">${m.time}${m.time?' · ':''}${m.type}</div>
+</div>
+<button class="btn-del" onclick="event.stopPropagation();deleteMed('${m.id}')">✕</button>
+</div>`;
+}).join('');
 }
 function toggleMed(id){
-  const m=S.meds.find(x=>x.id===id);if(!m)return;
-  if(!m.takenDates)m.takenDates=[];
-  if(m.takenDates.includes(TODAY))m.takenDates=m.takenDates.filter(d=>d!==TODAY);
-  else{m.takenDates.push(TODAY);showToast(`💊 ${m.name} logged`);}
-  save();renderMeds();
+const m=S.meds.find(x=>x.id===id);if(!m)return;
+if(!m.takenDates)m.takenDates=[];
+if(m.takenDates.includes(TODAY))m.takenDates=m.takenDates.filter(d=>d!==TODAY);
+else{m.takenDates.push(TODAY);showToast(`💊 ${m.name} logged`);}
+save();renderMeds();
 }
 function deleteMed(id){S.meds=S.meds.filter(m=>m.id!==id);save();renderMeds();}
 function saveMedNotes(){
-  const n=document.getElementById('med-notes').value;
-  if(S.logs[TODAY])S.logs[TODAY].medNotes=n;
-  save();showToast('Med notes saved');
+const n=document.getElementById('med-notes').value;
+if(S.logs[TODAY])S.logs[TODAY].medNotes=n;
+save();showToast('Med notes saved');
 }
-
-// ── INSIGHTS ─────────────────────────────────────────────────
 function renderInsights(){
-  const logs=Object.entries(S.logs).sort(([a],[b])=>a.localeCompare(b));
-  const recent=logs.slice(-14);
-  const last30=logs.slice(-30);
-
-  // Stats
-  const avgPain=last30.length?
-    (last30.reduce((s,[,l])=>s+(l.pain||0),0)/last30.length).toFixed(1):'--';
-  const bestDay=last30.reduce((best,[d,l])=>(l.pain&&(!best||l.pain<best.pain))?l:{...best,date:d},null);
-  const flares=last30.filter(([,l])=>l.flare).length;
-
-  document.getElementById('is-avg').textContent=avgPain;
-  document.getElementById('is-streak').textContent=S.streak;
-  document.getElementById('is-best').textContent=bestDay?.pain||'--';
-  document.getElementById('is-flares').textContent=flares;
-
-  // Trend chart
-  const chart=document.getElementById('trend-chart');
-  chart.innerHTML='';
-  const maxP=10;
-  recent.forEach(([d,l])=>{
-    const bar=document.createElement('div');
-    const p=l.pain||0;
-    const pct=(p/maxP)*100;
-    const col=p<=3?'var(--gr)':p<=6?'var(--am)':'var(--rd)';
-    bar.className='mc-bar';
-    bar.style.height=`${pct}%`;
-    bar.style.background=col;
-    bar.style.opacity=l.flare?1:.75;
-    bar.setAttribute('data-val',`${d.slice(5)}: ${p}/10${l.flare?' 🚨':''}`);
-    chart.appendChild(bar);
-  });
-  if(recent.length){
-    document.getElementById('trend-start').textContent=recent[0][0].slice(5);
-  }
-
-  // Insight cards
-  const insightEl=document.getElementById('insight-cards');
-  const tips=[];
-  const numericAvg=parseFloat(avgPain)||0;
-  if(numericAvg>6)tips.push({t:'rd',i:'🔴',msg:`<b>Your 30-day average is ${avgPain}/10.</b> This is in the severe range. Consider requesting an urgent review with your pain specialist. Bring your heat map.`});
-  else if(numericAvg>4)tips.push({t:'gold',i:'🟡',msg:`<b>30-day average: ${avgPain}/10.</b> Moderate range. Your logs are building a picture your doctor needs to see.`});
-  else if(numericAvg>0)tips.push({t:'gr',i:'🟢',msg:`<b>30-day average: ${avgPain}/10.</b> You're in the mild range. Keep logging to identify what's working.`});
-  if(flares>3)tips.push({t:'acc',i:'🌊',msg:`<b>${flares} flares this month.</b> High frequency. Track what preceded each flare — the pattern could reveal an avoidable trigger.`});
-  if(S.streak>=7)tips.push({t:'gold',i:'🔥',msg:`<b>${S.streak}-day logging streak!</b> Consistent data is your most powerful tool. Your doctor can now see real patterns.`});
-  if(!tips.length&&logs.length)tips.push({t:'pri',i:'📊',msg:`Keep logging daily. Patterns emerge after 14+ consecutive days. You're building valuable medical data.`});
-  insightEl.innerHTML=tips.map(t=>`<div class="insight ${t.t}"><div class="ii">${t.i}</div><div>${t.msg}</div></div>`).join('');
-
-  // Trigger analysis
-  const trigCount={};
-  last30.forEach(([,l])=>(l.triggers||[]).forEach(t=>{trigCount[t]=(trigCount[t]||0)+1;}));
-  const sorted=Object.entries(trigCount).sort(([,a],[,b])=>b-a).slice(0,5);
-  const trigEl=document.getElementById('trigger-analysis');
-  if(sorted.length){
-    trigEl.innerHTML=sorted.map(([t,c])=>{
-      const pct=Math.round(c/last30.length*100);
-      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <div style="flex:1;font-size:11px;font-weight:500;color:var(--ink2)">${t}</div>
-        <div style="width:180px;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
-          <div style="width:${pct}%;height:100%;background:var(--acc);border-radius:3px"></div>
-        </div>
-        <div style="font-size:10px;color:var(--ink4);width:40px;text-align:right">${c}×</div>
-      </div>`;
-    }).join('');
-  }else{
-    trigEl.innerHTML='<div class="empty">Log triggers daily to see patterns here.</div>';
-  }
-
-  // Area analysis
-  const areaCount={};
-  last30.forEach(([,l])=>(l.areas||[]).forEach(a=>{areaCount[a]=(areaCount[a]||0)+1;}));
-  const sortedAreas=Object.entries(areaCount).sort(([,a],[,b])=>b-a).slice(0,6);
-  const areaEl=document.getElementById('area-analysis');
-  if(sortedAreas.length){
-    areaEl.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px">${
-      sortedAreas.map(([a,c])=>`<div style="padding:6px 14px;border-radius:20px;background:var(--rd-s);border:1.5px solid rgba(184,84,84,.2);font-size:11px;font-weight:500;color:var(--rd)">${a} <span style="color:var(--ink4);font-weight:400">(${c}×)</span></div>`).join('')
-    }</div>`;
-  }else{
-    areaEl.innerHTML='<div class="empty">Log pain areas to see this analysis.</div>';
-  }
+const logs=Object.entries(S.logs).sort(([a],[b])=>a.localeCompare(b));
+const recent=logs.slice(-14);
+const last30=logs.slice(-30);
+const avgPain=last30.length?
+(last30.reduce((s,[,l])=>s+(l.pain||0),0)/last30.length).toFixed(1):'--';
+const bestDay=last30.reduce((best,[d,l])=>(l.pain&&(!best||l.pain<best.pain))?l:{...best,date:d},null);
+const flares=last30.filter(([,l])=>l.flare).length;
+document.getElementById('is-avg').textContent=avgPain;
+document.getElementById('is-streak').textContent=S.streak;
+document.getElementById('is-best').textContent=bestDay?.pain||'--';
+document.getElementById('is-flares').textContent=flares;
+const chart=document.getElementById('trend-chart');
+chart.innerHTML='';
+const maxP=10;
+recent.forEach(([d,l])=>{
+const bar=document.createElement('div');
+const p=l.pain||0;
+const pct=(p/maxP)*100;
+const col=p<=3?'var(--gr)':p<=6?'var(--am)':'var(--rd)';
+bar.className='mc-bar';
+bar.style.height=`${pct}%`;
+bar.style.background=col;
+bar.style.opacity=l.flare?1:.75;
+bar.setAttribute('data-val',`${d.slice(5)}: ${p}/10${l.flare?' 🚨':''}`);
+chart.appendChild(bar);
+});
+if(recent.length){
+document.getElementById('trend-start').textContent=recent[0][0].slice(5);
 }
-
-// ── DOCTOR REPORT (DEMO: blocked) ────────────────────────────
+const insightEl=document.getElementById('insight-cards');
+const tips=[];
+const numericAvg=parseFloat(avgPain)||0;
+if(numericAvg>6)tips.push({t:'rd',i:'🔴',msg:`<b>Your 30-day average is ${avgPain}/10.</b> This is in the severe range. Consider requesting an urgent review with your pain specialist. Bring your heat map.`});
+else if(numericAvg>4)tips.push({t:'gold',i:'🟡',msg:`<b>30-day average: ${avgPain}/10.</b> Moderate range. Your logs are building a picture your doctor needs to see.`});
+else if(numericAvg>0)tips.push({t:'gr',i:'🟢',msg:`<b>30-day average: ${avgPain}/10.</b> You're in the mild range. Keep logging to identify what's working.`});
+if(flares>3)tips.push({t:'acc',i:'🌊',msg:`<b>${flares} flares this month.</b> High frequency. Track what preceded each flare — the pattern could reveal an avoidable trigger.`});
+if(S.streak>=7)tips.push({t:'gold',i:'🔥',msg:`<b>${S.streak}-day logging streak!</b> Consistent data is your most powerful tool. Your doctor can now see real patterns.`});
+if(!tips.length&&logs.length)tips.push({t:'pri',i:'📊',msg:`Keep logging daily. Patterns emerge after 14+ consecutive days. You're building valuable medical data.`});
+insightEl.innerHTML=tips.map(t=>`<div class="insight ${t.t}"><div class="ii">${t.i}</div><div>${t.msg}</div></div>`).join('');
+const trigCount={};
+last30.forEach(([,l])=>(l.triggers||[]).forEach(t=>{trigCount[t]=(trigCount[t]||0)+1;}));
+const sorted=Object.entries(trigCount).sort(([,a],[,b])=>b-a).slice(0,5);
+const trigEl=document.getElementById('trigger-analysis');
+if(sorted.length){
+trigEl.innerHTML=sorted.map(([t,c])=>{
+const pct=Math.round(c/last30.length*100);
+return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+<div style="flex:1;font-size:11px;font-weight:500;color:var(--ink2)">${t}</div>
+<div style="width:180px;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
+<div style="width:${pct}%;height:100%;background:var(--acc);border-radius:3px"></div>
+</div>
+<div style="font-size:10px;color:var(--ink4);width:40px;text-align:right">${c}×</div>
+</div>`;
+}).join('');
+}else{
+trigEl.innerHTML='<div class="empty">Log triggers daily to see patterns here.</div>';
+}
+const areaCount={};
+last30.forEach(([,l])=>(l.areas||[]).forEach(a=>{areaCount[a]=(areaCount[a]||0)+1;}));
+const sortedAreas=Object.entries(areaCount).sort(([,a],[,b])=>b-a).slice(0,6);
+const areaEl=document.getElementById('area-analysis');
+if(sortedAreas.length){
+areaEl.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px">${
+sortedAreas.map(([a,c])=>`<div style="padding:6px 14px;border-radius:20px;background:var(--rd-s);border:1.5px solid rgba(184,84,84,.2);font-size:11px;font-weight:500;color:var(--rd)">${a} <span style="color:var(--ink4);font-weight:400">(${c}×)</span></div>`).join('')
+}</div>`;
+}else{
+areaEl.innerHTML='<div class="empty">Log pain areas to see this analysis.</div>';
+}
+}
 function generateReport(){
-  document.getElementById('demo-doctor-modal').classList.add('active');
-  return;
-  /* Full version code below: */
-  const name=document.getElementById('rpt-name').value||'Patient';
-  const date=document.getElementById('rpt-date').value||TODAY;
-  const doctor=document.getElementById('rpt-doctor').value||'Doctor';
-  const reason=document.getElementById('rpt-reason').value||'Pain review';
-  const concerns=document.getElementById('rpt-concerns').value;
-
-  const logs=Object.entries(S.logs).sort(([a],[b])=>a.localeCompare(b));
-  const last30=logs.slice(-30);
-  const avgPain=last30.length?(last30.reduce((s,[,l])=>s+(l.pain||0),0)/last30.length).toFixed(1):'N/A';
-  const bestPain=last30.reduce((b,[,l])=>l.pain&&l.pain<b?l.pain:b,10);
-  const worstPain=last30.reduce((b,[,l])=>l.pain&&l.pain>b?l.pain:b,0);
-  const flares=last30.filter(([,l])=>l.flare).length;
-  const goodDays=last30.filter(([,l])=>l.pain&&l.pain<=3).length;
-
-  const trigCount={};
-  last30.forEach(([,l])=>(l.triggers||[]).forEach(t=>{trigCount[t]=(trigCount[t]||0)+1;}));
-  const topTrigs=Object.entries(trigCount).sort(([,a],[,b])=>b-a).slice(0,4).map(([t,c])=>`${t} (${c}×)`).join(', ')||'None recorded';
-
-  const areaCount={};
-  last30.forEach(([,l])=>(l.areas||[]).forEach(a=>{areaCount[a]=(areaCount[a]||0)+1;}));
-  const topAreas=Object.entries(areaCount).sort(([,a],[,b])=>b-a).slice(0,4).map(([a,c])=>`${a} (${c}×)`).join(', ')||'None recorded';
-
-  const currentMeds=S.meds.map(m=>`${m.name}${m.time?' at '+m.time:''} (${m.type})`).join(', ')||'None recorded';
-
-  const rptEl=document.getElementById('report-preview');
-  rptEl.style.display='block';
-  rptEl.innerHTML=`
-    <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--sh);margin-top:14px">
-      <div style="border-bottom:2px solid var(--pri-dp);padding-bottom:14px;margin-bottom:18px">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--pri-dp)">Pain Management Report</div>
-        <div style="font-size:10px;color:var(--ink4);margin-top:3px;letter-spacing:.1em;text-transform:uppercase">Generated by Pain Companion App · StudioBoubou</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;font-size:11px">
-        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Patient</div><div style="color:var(--ink);font-weight:500;margin-top:2px">${name}</div></div>
-        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Appointment</div><div style="color:var(--ink);font-weight:500;margin-top:2px">${date} — ${doctor}</div></div>
-        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Reason</div><div style="color:var(--ink);margin-top:2px">${reason}</div></div>
-        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Report Period</div><div style="color:var(--ink);margin-top:2px">Last 30 logged days</div></div>
-      </div>
-      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:12px">Pain Statistics</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;text-align:center">
-        ${[['Average','avgPain',avgPain],['Best Day',null,bestPain+'/10'],['Worst Day',null,worstPain+'/10'],['Good Days',null,goodDays+' days']].map(([l,,v])=>`<div style="border:1px solid var(--line);border-radius:8px;padding:10px"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--pri-dp)">${v}</div><div style="font-size:8.5px;color:var(--ink4);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">${l}</div></div>`).join('')}
-      </div>
-      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Flares</div>
-      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${flares} flare episodes recorded in the report period.</div>
-      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Top Reported Triggers</div>
-      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${topTrigs}</div>
-      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Most Affected Areas</div>
-      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${topAreas}</div>
-      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Current Medications</div>
-      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${currentMeds}</div>
-      ${concerns?`<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">My Main Concerns for This Visit</div><div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px;line-height:1.7">${concerns}</div>`:''}
-      <div style="margin-top:16px;padding:12px;background:var(--pri-s);border-radius:8px;font-size:10px;color:var(--ink3);line-height:1.7">This report was generated from ${Object.keys(S.logs).length} logged days using the Pain Companion app (StudioBoubou). Data is stored locally on this device and has not been shared with any third party.</div>
-    </div>
-    <div style="text-align:right;margin-top:10px">
-      <button class="btn btn-gold" onclick="window.print()">🖨 Print Report</button>
-    </div>
-  `;
-  showToast('📋 Report generated');
+document.getElementById('demo-doctor-modal').classList.add('active');
+return;
+/* Full version code below: */
+const name=document.getElementById('rpt-name').value||'Patient';
+const date=document.getElementById('rpt-date').value||TODAY;
+const doctor=document.getElementById('rpt-doctor').value||'Doctor';
+const reason=document.getElementById('rpt-reason').value||'Pain review';
+const concerns=document.getElementById('rpt-concerns').value;
+const logs=Object.entries(S.logs).sort(([a],[b])=>a.localeCompare(b));
+const last30=logs.slice(-30);
+const avgPain=last30.length?(last30.reduce((s,[,l])=>s+(l.pain||0),0)/last30.length).toFixed(1):'N/A';
+const bestPain=last30.reduce((b,[,l])=>l.pain&&l.pain<b?l.pain:b,10);
+const worstPain=last30.reduce((b,[,l])=>l.pain&&l.pain>b?l.pain:b,0);
+const flares=last30.filter(([,l])=>l.flare).length;
+const goodDays=last30.filter(([,l])=>l.pain&&l.pain<=3).length;
+const trigCount={};
+last30.forEach(([,l])=>(l.triggers||[]).forEach(t=>{trigCount[t]=(trigCount[t]||0)+1;}));
+const topTrigs=Object.entries(trigCount).sort(([,a],[,b])=>b-a).slice(0,4).map(([t,c])=>`${t} (${c}×)`).join(', ')||'None recorded';
+const areaCount={};
+last30.forEach(([,l])=>(l.areas||[]).forEach(a=>{areaCount[a]=(areaCount[a]||0)+1;}));
+const topAreas=Object.entries(areaCount).sort(([,a],[,b])=>b-a).slice(0,4).map(([a,c])=>`${a} (${c}×)`).join(', ')||'None recorded';
+const currentMeds=S.meds.map(m=>`${m.name}${m.time?' at '+m.time:''} (${m.type})`).join(', ')||'None recorded';
+const rptEl=document.getElementById('report-preview');
+rptEl.style.display='block';
+rptEl.innerHTML=`
+<div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--sh);margin-top:14px">
+<div style="border-bottom:2px solid var(--pri-dp);padding-bottom:14px;margin-bottom:18px">
+<div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--pri-dp)">Pain Management Report</div>
+<div style="font-size:10px;color:var(--ink4);margin-top:3px;letter-spacing:.1em;text-transform:uppercase">Generated by Pain Companion App · StudioBoubou</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;font-size:11px">
+<div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Patient</div><div style="color:var(--ink);font-weight:500;margin-top:2px">${name}</div></div>
+<div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Appointment</div><div style="color:var(--ink);font-weight:500;margin-top:2px">${date} — ${doctor}</div></div>
+<div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Reason</div><div style="color:var(--ink);margin-top:2px">${reason}</div></div>
+<div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Report Period</div><div style="color:var(--ink);margin-top:2px">Last 30 logged days</div></div>
+</div>
+<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:12px">Pain Statistics</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;text-align:center">
+${[['Average','avgPain',avgPain],['Best Day',null,bestPain+'/10'],['Worst Day',null,worstPain+'/10'],['Good Days',null,goodDays+' days']].map(([l,,v])=>`<div style="border:1px solid var(--line);border-radius:8px;padding:10px"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--pri-dp)">${v}</div><div style="font-size:8.5px;color:var(--ink4);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">${l}</div></div>`).join('')}
+</div>
+<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Flares</div>
+<div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${flares} flare episodes recorded in the report period.</div>
+<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Top Reported Triggers</div>
+<div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${topTrigs}</div>
+<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Most Affected Areas</div>
+<div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${topAreas}</div>
+<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Current Medications</div>
+<div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${currentMeds}</div>
+${concerns?`<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">My Main Concerns for This Visit</div><div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px;line-height:1.7">${concerns}</div>`:''}
+<div style="margin-top:16px;padding:12px;background:var(--pri-s);border-radius:8px;font-size:10px;color:var(--ink3);line-height:1.7">This report was generated from ${Object.keys(S.logs).length} logged days using the Pain Companion app (StudioBoubou). Data is stored locally on this device and has not been shared with any third party.</div>
+</div>
+<div style="text-align:right;margin-top:10px">
+<button class="btn btn-gold" onclick="window.print()">🖨 Print Report</button>
+</div>
+`;
+showToast('📋 Report generated');
 }
-
-// ── TABS ─────────────────────────────────────────────────────
 function switchTab(name){
-  document.querySelectorAll('.nb').forEach(b=>{b.classList.remove('active','acc','gold','gr','rd');});
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const btn=document.querySelector(`.nb[data-tab="${name}"]`);
-  btn.classList.add('active');
-  const col=btn.dataset.color;if(col)btn.classList.add(col);
-  document.getElementById(`panel-${name}`).classList.add('active');
-  if(name==='heatmap')renderHeatMap();
-  if(name==='insights')renderInsights();
-  if(name==='meds')renderMeds();
+document.querySelectorAll('.nb').forEach(b=>{b.classList.remove('active','acc','gold','gr','rd');});
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+const btn=document.querySelector(`.nb[data-tab="${name}"]`);
+btn.classList.add('active');
+const col=btn.dataset.color;if(col)btn.classList.add(col);
+document.getElementById(`panel-${name}`).classList.add('active');
+if(name==='heatmap')renderHeatMap();
+if(name==='insights')renderInsights();
+if(name==='meds')renderMeds();
 }
-
-// ── FLARE ────────────────────────────────────────────────────
 function openFlare(){document.getElementById('flare-overlay').classList.add('active');}
 function closeFlare(){document.getElementById('flare-overlay').classList.remove('active');}
-
-// ── TOAST ────────────────────────────────────────────────────
 function showToast(msg){
-  const tw=document.getElementById('toast');
-  document.getElementById('toast-msg').textContent=msg;
-  tw.classList.add('show');setTimeout(()=>tw.classList.remove('show'),2800);
+const tw=document.getElementById('toast');
+document.getElementById('toast-msg').textContent=msg;
+tw.classList.add('show');setTimeout(()=>tw.classList.remove('show'),2800);
 }
-
-// ── INIT ─────────────────────────────────────────────────────
 function init(){
-  load();
-  const months=['January','February','March','April','May','June','July',
-    'August','September','October','November','December'];
-  document.getElementById('hdate').textContent=`${months[NOW.getMonth()]} ${NOW.getDate()}, ${NOW.getFullYear()}`;
-  document.getElementById('streak-num').textContent=S.streak;
-  buildPainBar();
-  buildSpoons();
-  buildAreaGrid();
-  buildTrigGrid();
-  renderMeds();
-  renderRecentLogs();
-  renderHeatMap();
-  renderInsights();
-
-  // Load today's log if exists
-  if(S.logs[TODAY]){
-    const l=S.logs[TODAY];
-    if(l.pain)setPain(l.pain);
-    if(l.sleep)document.getElementById('sl-sleep').value=l.sleep;
-    if(l.energy)document.getElementById('sl-energy').value=l.energy;
-    if(l.mood)document.getElementById('sl-mood').value=l.mood;
-    if(l.stress)document.getElementById('sl-stress').value=l.stress;
-    if(l.notes)document.getElementById('log-notes').value=l.notes;
-    if(l.areas)(l.areas).forEach(a=>selectedAreas.add(a));
-    if(l.triggers)(l.triggers).forEach(t=>selectedTrigs.add(t));
-    buildAreaGrid();buildTrigGrid();
-  }
-
-  document.querySelectorAll('.nb').forEach(btn=>{
-    btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
-  });
-
-  // Update sliders display
-  ['sl-sleep','sl-energy','sl-mood','sl-stress'].forEach(id=>{
-    const inp=document.getElementById(id);
-    if(inp)inp.dispatchEvent(new Event('input'));
-  });
+load();
+const months=['January','February','March','April','May','June','July',
+'August','September','October','November','December'];
+document.getElementById('hdate').textContent=`${months[NOW.getMonth()]} ${NOW.getDate()}, ${NOW.getFullYear()}`;
+document.getElementById('streak-num').textContent=S.streak;
+buildPainBar();
+buildSpoons();
+buildAreaGrid();
+buildTrigGrid();
+renderMeds();
+renderRecentLogs();
+renderHeatMap();
+renderInsights();
+if(S.logs[TODAY]){
+const l=S.logs[TODAY];
+if(l.pain)setPain(l.pain);
+if(l.sleep)document.getElementById('sl-sleep').value=l.sleep;
+if(l.energy)document.getElementById('sl-energy').value=l.energy;
+if(l.mood)document.getElementById('sl-mood').value=l.mood;
+if(l.stress)document.getElementById('sl-stress').value=l.stress;
+if(l.notes)document.getElementById('log-notes').value=l.notes;
+if(l.areas)(l.areas).forEach(a=>selectedAreas.add(a));
+if(l.triggers)(l.triggers).forEach(t=>selectedTrigs.add(t));
+buildAreaGrid();buildTrigGrid();
 }
-
+document.querySelectorAll('.nb').forEach(btn=>{
+btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+});
+['sl-sleep','sl-energy','sl-mood','sl-stress'].forEach(id=>{
+const inp=document.getElementById(id);
+if(inp)inp.dispatchEvent(new Event('input'));
+});
+}
 document.addEventListener('DOMContentLoaded',init);
+</script>
+<script>
+(function(){var b=document.querySelector('.demo-badge,.demo-fab');if(!b||b.style.display==='none'){document.body.innerHTML='<div style="text-align:center;padding:100px"><h1>Error</h1></div>';return;}
 document.addEventListener('contextmenu',function(e){e.preventDefault();});
-document.addEventListener('selectstart',function(e){if(e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'&&e.target.tagName!=='SELECT'){e.preventDefault();}});
-document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='u'){e.preventDefault();}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='I'){e.preventDefault();}});
-setInterval(function(){var m=document.querySelector('.main');if(m&&m.style.display==='none'){m.style.display='';} var f=document.querySelector('.demo-fab');if(f&&f.style.display==='none'){f.style.display='';} var b=document.querySelector('.demo-badge');if(b&&b.style.display==='none'){b.style.display='';}},5000);
+document.addEventListener('selectstart',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;e.preventDefault();});
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='u')e.preventDefault();if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(e.key==='i'||e.key==='I'||e.key==='j'||e.key==='J'))e.preventDefault();});
+setInterval(function(){var b=document.querySelector('.demo-badge,.demo-fab');var c=document.querySelector('.demo-cta,[class*="demo-cta"]');if(!b||b.style.display==='none'){document.querySelectorAll('.panel').forEach(function(p){p.innerHTML='';})}},5000);})();
 </script>
 </body>
 </html>
