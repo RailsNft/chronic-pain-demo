@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Pain Companion — Chronic Pain & Illness Journal App (DEMO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pri:#5B8FAF;--pri-d:#3D6B8A;--pri-dp:#2A4D66;--pri-l:#D4E4F0;--pri-s:rgba(91,143,175,.09);
+  --acc:#8B7EB8;--acc-d:#6A5E9A;--acc-l:#E4DEFF;--acc-s:rgba(139,126,184,.09);
+  --gold:#B8884E;--gold-l:#F0DFC0;--gold-s:rgba(184,136,78,.1);
+  --gr:#4A9E72;--gr-s:rgba(74,158,114,.12);
+  --am:#C4883A;--am-s:rgba(196,136,58,.12);
+  --rd:#B85454;--rd-s:rgba(184,84,84,.12);
+  --ink:#1A1F2E;--ink2:#3A4258;--ink3:#6A7488;--ink4:#A0AABE;
+  --cream:#FDFAF6;--line:#D4DEE8;--line2:#C0CCDA;--bg:#EEF3F8;
+  --sh:0 4px 24px rgba(42,77,102,.11)
+}
+html{font-size:14px}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;padding:0 0 80px;min-height:100vh}
+
+/* ── HEADER ── */
+.app-header{width:100%;max-width:900px;padding:20px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,var(--pri-dp),var(--acc-d));
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(42,77,102,.3)}
+.logo-txt{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--pri-dp)}
+.logo-sub{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--ink4)}
+.header-badges{display:flex;gap:8px;align-items:center}
+.hbadge{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600}
+.hbadge.streak{background:linear-gradient(135deg,var(--gold),#c8920a);color:#fff;
+  box-shadow:0 2px 8px rgba(184,136,78,.4)}
+.hbadge.spoons{background:var(--acc-l);color:var(--acc-d)}
+.hdate{font-size:10px;color:var(--ink4);font-weight:500;text-align:right}
+
+/* ── PAIN CARD ── */
+.pain-card{width:100%;max-width:900px;
+  background:linear-gradient(135deg,var(--pri-dp) 0%,#3a5878 60%,var(--acc-d) 100%);
+  border-radius:0 0 16px 16px;padding:22px 24px 24px;
+  overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(42,77,102,.25)}
+.pain-card::before{content:'';position:absolute;top:-60px;right:-40px;
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.06),transparent 70%)}
+
+/* ── NAV ── */
+.nav{width:100%;max-width:900px;background:#fff;padding:5px;
+  display:flex;gap:2px;box-shadow:0 2px 14px rgba(42,77,102,.1)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 4px;border:none;background:transparent;cursor:pointer;
+  border-radius:9px;transition:all .2s;color:var(--ink4)}
+.nb:hover{background:var(--pri-s);color:var(--pri-d)}
+.nb.active{background:var(--pri-dp);color:#fff}
+.nb.active.acc{background:var(--acc-d)}.nb.active.gold{background:var(--gold)}
+.nb.active.gr{background:var(--gr)}.nb.active.rd{background:var(--rd)}
+.nb svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nb span{font-size:8px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+
+/* ── MAIN ── */
+.main{width:100%;max-width:900px;padding:18px 16px;min-height:400px}
+.panel{display:none}.panel.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── CARDS ── */
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--sh)}
+.card.pri{background:linear-gradient(135deg,var(--pri-dp),#3a6080);color:#fff}
+.card.acc{background:linear-gradient(135deg,var(--acc-d),#5a4e8a);color:#fff}
+.card.gold{background:linear-gradient(135deg,var(--gold),#a07030);color:#fff}
+.card.gr{background:linear-gradient(135deg,var(--gr),#357a58);color:#fff}
+.card.rd{background:linear-gradient(135deg,var(--rd),#8a3535);color:#fff}
+.card.soft-pri{background:var(--pri-s);border:1.5px solid rgba(91,143,175,.15)}
+.card.soft-acc{background:var(--acc-s);border:1.5px solid rgba(139,126,184,.15)}
+.card.soft-gold{background:var(--gold-s);border:1.5px solid rgba(184,136,78,.15)}
+.card.soft-gr{background:var(--gr-s);border:1.5px solid rgba(74,158,114,.2)}
+.card.soft-rd{background:var(--rd-s);border:1.5px solid rgba(184,84,84,.2)}
+
+.ctitle{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;
+  color:var(--pri-dp);margin-bottom:12px}
+.ctitle.w{color:#fff}.csub{font-size:11px;color:var(--ink3);margin-bottom:12px}
+
+/* ── SECTION LABELS ── */
+.sl{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sl.pri{color:var(--pri-d)}.sl.acc{color:var(--acc-d)}.sl.gold{color:var(--gold)}
+.sl.gr{color:var(--gr)}.sl.rd{color:var(--rd)}
+.sl::after{content:'';flex:1;height:1.5px;background:currentColor;opacity:.15}
+
+/* ── PAIN SLIDER ── */
+.pain-slider-wrap{position:relative;margin-bottom:8px}
+.pain-scale{display:flex;gap:3px;margin-bottom:6px}
+.ps-num{width:100%;text-align:center;font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:600;color:#fff;line-height:1}
+.ps-label{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.15em;text-transform:uppercase}
+.pain-bar{display:flex;gap:2px;margin-bottom:12px}
+.pb-seg{flex:1;height:8px;border-radius:4px;transition:all .2s;cursor:pointer;opacity:.4}
+.pb-seg.active{opacity:1;transform:scaleY(1.4)}
+.pb-seg.s1{background:var(--gr)}.pb-seg.s2{background:#6ab870}.pb-seg.s3{background:#9ac860}
+.pb-seg.s4{background:#c8d050}.pb-seg.s5{background:#e0c040}
+.pb-seg.s6{background:var(--am)}.pb-seg.s7{background:#d07030}
+.pb-seg.s8{background:#c85040}.pb-seg.s9{background:var(--rd)}.pb-seg.s10{background:#8a2020}
+
+/* ── SLIDERS ── */
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slider-emoji{font-size:18px;flex-shrink:0;width:26px;text-align:center}
+.slider-lbl{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink3);width:52px;flex-shrink:0}
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;
+  background:var(--line);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--pri-d);border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(42,77,102,.3);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
+input[type=range].acc::-webkit-slider-thumb{background:var(--acc-d)}
+input[type=range].gold::-webkit-slider-thumb{background:var(--gold)}
+input[type=range].gr::-webkit-slider-thumb{background:var(--gr)}
+input[type=range].rd::-webkit-slider-thumb{background:var(--rd)}
+.slider-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;
+  color:var(--pri-dp);width:24px;text-align:right}
+
+/* ── SPOON TRACKER ── */
+.spoon-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.spoon{width:36px;height:36px;border-radius:50%;border:2px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  cursor:pointer;transition:all .2s;background:#fff}
+.spoon.used{border-color:var(--acc);background:var(--acc-l);transform:scale(.9);opacity:.5}
+.spoon.selected{border-color:var(--acc-d);background:var(--acc-l);box-shadow:0 0 0 3px rgba(139,126,184,.2)}
+
+/* ── BODY AREA CHIPS ── */
+.area-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.area-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;
+  border:1.5px solid var(--line2);background:#fff;cursor:pointer;
+  transition:all .18s;color:var(--ink2)}
+.area-chip:hover{border-color:var(--pri);color:var(--pri-d)}
+.area-chip.active{border-color:var(--rd);background:var(--rd-s);color:var(--rd)}
+.area-chip.mild{border-color:var(--gr);background:var(--gr-s);color:var(--gr)}
+
+/* ── TRIGGER CHIPS ── */
+.trig-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;
+  border:1.5px solid var(--line2);background:#fff;cursor:pointer;
+  transition:all .18s;color:var(--ink2)}
+.trig-chip.active{border-color:var(--acc);background:var(--acc-s);color:var(--acc-d)}
+
+/* ── HEAT MAP ── */
+.hm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:8px}
+.hm-day{border:1.5px solid var(--line);border-radius:6px;aspect-ratio:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:9px;font-weight:600;color:var(--ink4);cursor:pointer;
+  transition:all .2s;position:relative}
+.hm-day:hover{border-color:var(--pri);transform:scale(1.05)}
+.hm-day.p0{background:#fff}
+.hm-day.p1{background:rgba(74,158,114,.18);border-color:rgba(74,158,114,.4);color:var(--gr)}
+.hm-day.p2{background:rgba(196,136,58,.18);border-color:rgba(196,136,58,.4);color:var(--am)}
+.hm-day.p3{background:rgba(184,84,84,.18);border-color:rgba(184,84,84,.4);color:var(--rd)}
+.hm-day.flare{box-shadow:inset 0 0 0 2px var(--acc)}
+.hm-val{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;line-height:1}
+.hm-n{font-size:8px;color:var(--ink4);font-weight:400}
+
+/* ── MED TRACKER ── */
+.med-item{display:flex;align-items:center;gap:10px;padding:11px 14px;
+  border:1.5px solid var(--line);border-radius:10px;margin-bottom:7px;
+  cursor:pointer;transition:.18s}
+.med-item:hover{border-color:var(--pri)}
+.med-item.taken{background:var(--gr-s);border-color:var(--gr)}
+.med-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.med-item.taken .med-dot{background:var(--gr);border-color:var(--gr);color:#fff}
+.med-name{flex:1;font-size:12px;font-weight:500;color:var(--ink)}
+.med-time{font-size:10px;color:var(--ink4)}
+.med-item.taken .med-name{color:var(--gr)}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:10px;padding:14px 12px;
+  text-align:center;box-shadow:var(--sh)}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;line-height:1}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink4);margin-top:3px}
+.stat-val.pri{color:var(--pri-d)}.stat-val.acc{color:var(--acc-d)}
+.stat-val.gold{color:var(--gold)}.stat-val.gr{color:var(--gr)}
+
+/* ── INSIGHTS ── */
+.insight{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;
+  border-radius:8px;font-size:11.5px;line-height:1.65;font-weight:400;margin-bottom:8px}
+.insight.pri{background:var(--pri-s);border-left:3px solid var(--pri-d);color:var(--ink2)}
+.insight.acc{background:var(--acc-s);border-left:3px solid var(--acc-d);color:var(--ink2)}
+.insight.gold{background:var(--gold-s);border-left:3px solid var(--gold);color:var(--ink2)}
+.insight.gr{background:var(--gr-s);border-left:3px solid var(--gr);color:var(--ink2)}
+.insight.rd{background:var(--rd-s);border-left:3px solid var(--rd);color:var(--ink2)}
+.ii{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* ── TEXTAREA / INPUT ── */
+textarea,input[type=text],select{
+  border:1.5px solid var(--line);border-radius:8px;padding:10px 13px;
+  font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);
+  outline:none;transition:.2s;background:#fff;width:100%;resize:vertical}
+textarea:focus,input[type=text]:focus,select:focus{
+  border-color:var(--pri);box-shadow:0 0 0 3px rgba(91,143,175,.1)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;
+  border:none;border-radius:20px;font-family:'DM Sans',sans-serif;
+  font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;transition:all .2s}
+.btn-pri{background:var(--pri-dp);color:#fff;box-shadow:0 3px 10px rgba(42,77,102,.3)}
+.btn-pri:hover{background:#1e3a52;transform:translateY(-1px)}
+.btn-acc{background:var(--acc-d);color:#fff}
+.btn-acc:hover{opacity:.9;transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{opacity:.9}
+.btn-gr{background:var(--gr);color:#fff}
+.btn-rd{background:var(--rd);color:#fff}
+.btn-ghost{background:transparent;border:2px solid var(--line);color:var(--ink2)}
+.btn-ghost:hover{border-color:var(--pri);color:var(--pri-d)}
+.btn-sm{padding:7px 14px;font-size:10px}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--ink4);font-size:12px;padding:2px 5px}
+.btn-del:hover{color:var(--rd)}
+
+/* ── FLARE SOS ── */
+.flare-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;
+  border-radius:50%;background:linear-gradient(135deg,var(--rd),#8a2020);
+  border:none;cursor:pointer;font-size:22px;color:#fff;
+  box-shadow:0 4px 20px rgba(184,84,84,.5);transition:all .2s;z-index:800}
+.flare-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(184,84,84,.6)}
+.flare-overlay{position:fixed;inset:0;background:rgba(26,15,15,.96);z-index:900;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  padding:24px}
+.flare-overlay.active{display:flex;animation:fadeIn .2s ease}
+.fo-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;
+  color:#fff;text-align:center}
+.fo-sub{font-size:12px;color:rgba(255,255,255,.5);text-align:center}
+.fo-close{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);
+  border:none;border-radius:50%;width:40px;height:40px;color:#fff;
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ── CHART ── */
+.chart-wrap{width:100%;overflow-x:auto}
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:80px;
+  padding:0 2px;margin-bottom:8px}
+.mc-bar{flex:1;min-width:14px;border-radius:3px 3px 0 0;transition:height .4s ease;
+  cursor:pointer;position:relative}
+.mc-bar:hover::after{content:attr(data-val);position:absolute;
+  top:-22px;left:50%;transform:translateX(-50%);
+  background:var(--pri-dp);color:#fff;font-size:9px;padding:2px 5px;
+  border-radius:4px;white-space:nowrap;pointer-events:none}
+
+/* ── FORM HELPERS ── */
+.frow{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}
+.ff{display:flex;flex-direction:column;gap:4px;flex:1;min-width:80px}
+.ff label{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);
+  transition:transform .3s;z-index:800;pointer-events:none}
+.toast-wrap.show{transform:translateX(-50%) translateY(0)}
+.toast{background:var(--pri-dp);color:#fff;padding:12px 22px;border-radius:20px;
+  font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(42,77,102,.4);white-space:nowrap}
+
+/* ── MISC ── */
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.divider{border:none;border-top:1.5px solid var(--line);margin:14px 0}
+.empty{text-align:center;padding:28px;color:var(--ink4);font-size:11px;font-weight:500;line-height:1.9}
+.muted{color:var(--ink4);font-size:11px}
+.log-item{padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;
+  margin-bottom:8px;background:#fff;transition:.18s}
+.log-item:hover{border-color:var(--pri-l)}
+
+@media(max-width:580px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .header-badges{display:none}
+}
+
+/* ── DEMO STYLES ── */
+.demo-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;
+  background:var(--pri-d);color:#fff;font-size:9px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;margin-left:10px;vertical-align:middle}
+.demo-fab{position:fixed;bottom:24px;left:24px;z-index:800;
+  padding:12px 22px;border-radius:28px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--pri-dp),var(--acc-d));color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;text-decoration:none;
+  box-shadow:0 4px 20px rgba(42,77,102,.45);transition:all .2s}
+.demo-fab:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(42,77,102,.55)}
+.demo-modal-bg{position:fixed;inset:0;background:rgba(26,31,46,.7);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:24px}
+.demo-modal-bg.active{display:flex}
+.demo-modal{background:#fff;border-radius:16px;padding:32px 28px;max-width:420px;width:100%;
+  text-align:center;box-shadow:0 12px 48px rgba(42,77,102,.3)}
+.demo-modal h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;
+  color:var(--pri-dp);margin-bottom:10px}
+.demo-modal p{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:18px}
+.demo-modal .btn{display:block;width:100%;text-align:center;margin-bottom:8px}
+.main::after{content:'DEMO';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:120px;font-weight:900;color:rgba(61,107,138,.04);pointer-events:none;z-index:0;letter-spacing:.2em;font-family:'Playfair Display',serif;}
+</style>
+</head>
+<body>
+
+<!-- ── FLARE SOS OVERLAY ── -->
+<div class="flare-overlay" id="flare-overlay">
+  <button class="fo-close" onclick="closeFlare()">✕</button>
+  <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4)">🚨 FLARE PROTOCOL</div>
+  <div class="fo-title">You Are Not Alone.</div>
+  <div class="fo-sub">Your pain is real. This moment will pass.</div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:480px">
+    <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px;border-left:3px solid var(--rd)">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px">Step 1 — Stop & Breathe</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.7">Breathe in for 4 seconds. Hold for 4. Out for 6. Repeat 4 times. This activates your parasympathetic nervous system and reduces pain perception.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px;border-left:3px solid var(--am)">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px">Step 2 — First Line Medication</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.7" id="fo-meds">Check your medication log. Take your prescribed rescue medication.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px;border-left:3px solid var(--acc)">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px">Step 3 — Environment</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.7">Reduce stimulation: dim light, quiet, comfortable position. Apply heat or cold to painful area. Use headphones with calming audio if helpful.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px;border-left:3px solid var(--pri)">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px">Crisis Support</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.7">
+        <b style="color:#fff">988</b> — Suicide & Crisis Lifeline (US)<br>
+        <b style="color:#fff">3114</b> — Numéro National de Prévention (FR)<br>
+        <b style="color:#fff">Crisis Text</b> — Text HOME to 741741
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.2)" onclick="logFlare();closeFlare()">Log this flare</button>
+    <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.2)" onclick="closeFlare()">I'm okay — close</button>
+  </div>
+</div>
+
+<!-- ── FLARE BUTTON ── -->
+<button class="flare-btn" onclick="openFlare()" title="Flare SOS Protocol">🚨</button>
+
+<!-- ── HEADER ── -->
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FAF8F5" stroke-width="2" stroke-linecap="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-txt">Pain Companion</div>
+      <div class="logo-sub">Chronic Pain & Illness Journal App <span class="demo-badge">DEMO</span></div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <div class="hbadge streak">🔥 <span id="streak-num">0</span> days</div>
+    <div class="hbadge spoons">🥄 <span id="spoons-left">10</span> spoons</div>
+  </div>
+  <div class="hdate" id="hdate"></div>
+</header>
+
+<!-- ── PAIN CARD ── -->
+<div class="pain-card">
+  <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start">
+    <div>
+      <div style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px">Today's Pain Level</div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;color:#fff;line-height:1" id="pain-display">5</div>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,.7)" id="pain-label">Moderate</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4)" id="pain-desc">Noticeably painful</div>
+        </div>
+      </div>
+      <div class="pain-bar" id="pain-bar"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.2);padding:7px 14px;font-size:10px" onclick="switchTab('log')">Log Details</button>
+        <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.2);padding:7px 14px;font-size:10px" onclick="switchTab('heatmap')">View Month</button>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Spoons Today</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;color:#fff;line-height:1" id="spoon-display">10</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">remaining</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <button class="nb active" data-tab="log" data-color="">
+    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <span>Log Pain</span>
+  </button>
+  <button class="nb" data-tab="heatmap" data-color="acc">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Heat Map</span>
+  </button>
+  <button class="nb" data-tab="meds" data-color="gr">
+    <svg viewBox="0 0 24 24"><path d="M10.5 20H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H20a2 2 0 0 1 2 2v2"/><circle cx="18" cy="18" r="4"/><path d="M18 16v4"/><path d="M16 18h4"/></svg>
+    <span>Meds</span>
+  </button>
+  <button class="nb" data-tab="insights" data-color="gold">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Insights</span>
+  </button>
+  <button class="nb" data-tab="doctor" data-color="pri">
+    <svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>
+    <span>Doctor</span>
+  </button>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+<!-- ═══ LOG PAIN ═══ -->
+<div class="panel active" id="panel-log">
+
+  <div class="insight pri" style="margin-bottom:14px">
+    <div class="ii">📝</div>
+    <div>Even 2 minutes of daily logging reveals patterns that can transform your care. Your data matters.</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Daily Check-In</div>
+    <div class="sl pri">Vitals</div>
+    <div class="slider-row">
+      <div class="slider-emoji">😴</div>
+      <div class="slider-lbl">Sleep hrs</div>
+      <input type="range" min="0" max="12" value="7" step=".5" id="sl-sleep" oninput="updateSlider(this,'sv-sleep','pri-d')">
+      <div class="slider-val" style="color:var(--pri-d)" id="sv-sleep">7</div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-emoji">⚡</div>
+      <div class="slider-lbl">Energy</div>
+      <input type="range" class="acc" min="1" max="10" value="5" id="sl-energy" oninput="updateSlider(this,'sv-energy','acc-d')">
+      <div class="slider-val" style="color:var(--acc-d)" id="sv-energy">5</div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-emoji">😟</div>
+      <div class="slider-lbl">Mood</div>
+      <input type="range" class="gold" min="1" max="10" value="5" id="sl-mood" oninput="updateSlider(this,'sv-mood','gold')">
+      <div class="slider-val" style="color:var(--gold)" id="sv-mood">5</div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-emoji">😰</div>
+      <div class="slider-lbl">Stress</div>
+      <input type="range" class="rd" min="1" max="10" value="4" id="sl-stress" oninput="updateSlider(this,'sv-stress','rd')">
+      <div class="slider-val" style="color:var(--rd)" id="sv-stress">4</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Pain Location</div>
+    <div class="csub">Tap areas in pain — tap again for mild/moderate severity</div>
+    <div class="area-grid" id="area-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Triggers Today</div>
+    <div class="area-grid" id="trig-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Spoon Budget</div>
+    <div class="csub">Tap spoons to mark as used. Drag to rearrange.</div>
+    <div class="spoon-grid" id="spoon-grid"></div>
+    <div class="row">
+      <div class="muted">Available: <b id="spoons-available">10</b></div>
+      <div class="muted" style="margin-left:auto">Used: <b id="spoons-used">0</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Notes</div>
+    <textarea id="log-notes" rows="3" placeholder="What happened today? Any observations about your pain, what helped, what made it worse..."></textarea>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:4px">
+    <button class="btn btn-pri" style="flex:1" onclick="saveLog()">Save Today's Log</button>
+    <button class="btn btn-ghost" onclick="clearToday()">Clear</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sl pri">Recent Logs</div>
+  <div id="recent-logs"></div>
+</div>
+
+<!-- ═══ HEAT MAP ═══ -->
+<div class="panel" id="panel-heatmap">
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <button class="btn btn-ghost btn-sm" onclick="changeMonth(-1)">← Prev</button>
+    <div style="flex:1;text-align:center;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--pri-dp)" id="hm-month-label"></div>
+    <button class="btn btn-ghost btn-sm" onclick="changeMonth(1)">Next →</button>
+  </div>
+
+  <div class="card">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px">
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">MON</div>
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">TUE</div>
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">WED</div>
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">THU</div>
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">FRI</div>
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">SAT</div>
+      <div style="text-align:center;font-size:8px;font-weight:600;letter-spacing:.1em;color:var(--ink4)">SUN</div>
+    </div>
+    <div class="hm-grid" id="hm-grid"></div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3)">
+        <div style="width:14px;height:14px;border-radius:3px;background:rgba(74,158,114,.2);border:1px solid rgba(74,158,114,.5)"></div>1-3 Mild
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3)">
+        <div style="width:14px;height:14px;border-radius:3px;background:rgba(196,136,58,.2);border:1px solid rgba(196,136,58,.5)"></div>4-6 Moderate
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3)">
+        <div style="width:14px;height:14px;border-radius:3px;background:rgba(184,84,84,.2);border:1px solid rgba(184,84,84,.5)"></div>7-10 Severe
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3)">
+        <div style="width:14px;height:14px;border-radius:3px;border:2px solid var(--acc);background:transparent"></div>Flare
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val gr" id="hm-good">0</div><div class="stat-lbl">Good Days</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--am)" id="hm-mod">0</div><div class="stat-lbl">Moderate</div></div>
+    <div class="stat-card"><div class="stat-val rd" id="hm-bad">0</div><div class="stat-lbl">Severe</div></div>
+    <div class="stat-card"><div class="stat-val acc" id="hm-flares">0</div><div class="stat-lbl">Flares</div></div>
+  </div>
+
+  <div class="card soft-acc">
+    <div class="ctitle" style="color:var(--acc-d)">Monthly Average</div>
+    <div style="display:flex;align-items:baseline;gap:10px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;color:var(--acc-d)" id="hm-avg">--</div>
+      <div style="font-size:11px;color:var(--ink3)">/10 average pain this month</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MEDS ═══ -->
+<div class="panel" id="panel-meds">
+
+  <div class="insight gr" style="margin-bottom:14px">
+    <div class="ii">💊</div>
+    <div>Check each medication as taken. This log becomes evidence of your treatment regime for doctor visits.</div>
+  </div>
+
+  <div class="sl gr">Today's Medications</div>
+  <div id="med-list"></div>
+
+  <div class="card soft-gr">
+    <div class="ctitle" style="color:var(--gr);font-size:14px">Add Medication</div>
+    <div class="frow">
+      <div class="ff"><label>Name + Dose</label><input type="text" id="med-name" placeholder="e.g. Lyrica 75mg"></div>
+      <div class="ff" style="max-width:90px"><label>Time</label><input type="text" id="med-time" placeholder="08:00"></div>
+      <div class="ff" style="max-width:110px"><label>Type</label>
+        <select id="med-type">
+          <option>Prescription</option><option>OTC</option><option>Supplement</option><option>Topical</option>
+        </select>
+      </div>
+      <button class="btn btn-gr btn-sm" style="align-self:flex-end" onclick="addMed()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sl gr">Medication Efficacy Notes</div>
+  <div class="card">
+    <div class="csub">Record which medications worked today and for what type of pain</div>
+    <textarea id="med-notes" rows="3" placeholder="e.g. Ibuprofen helped with lower back by ~3 points after 45 min. Amitriptyline — slept 7hrs for first time this week..."></textarea>
+    <div style="margin-top:8px">
+      <button class="btn btn-ghost btn-sm" onclick="saveMedNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INSIGHTS ═══ -->
+<div class="panel" id="panel-insights">
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val pri" id="is-avg">--</div><div class="stat-lbl">Avg Pain</div></div>
+    <div class="stat-card"><div class="stat-val acc" id="is-streak">0</div><div class="stat-lbl">Log Streak</div></div>
+    <div class="stat-card"><div class="stat-val gold" id="is-best">--</div><div class="stat-lbl">Best Day</div></div>
+    <div class="stat-card"><div class="stat-val rd" id="is-flares">0</div><div class="stat-lbl">Flares</div></div>
+  </div>
+
+  <div class="sl pri">Pain Trend — Last 14 Days</div>
+  <div class="card">
+    <div class="mini-chart" id="trend-chart"></div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink4)">
+      <span id="trend-start">--</span><span id="trend-end">Today</span>
+    </div>
+  </div>
+
+  <div id="insight-cards"></div>
+
+  <div class="sl gold">Top Triggers</div>
+  <div id="trigger-analysis"></div>
+
+  <div class="sl acc">Pain by Body Area</div>
+  <div id="area-analysis"></div>
+</div>
+
+<!-- ═══ DOCTOR REPORT ═══ -->
+<div class="panel" id="panel-doctor">
+
+  <div class="insight gold" style="margin-bottom:14px">
+    <div class="ii">🩺</div>
+    <div><b>Prepare for your appointment.</b> This report summarizes your data. Print it or show it on your phone at your next visit.</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Report Settings</div>
+    <div class="frow">
+      <div class="ff"><label>Your Name</label><input type="text" id="rpt-name" placeholder="Your name"></div>
+      <div class="ff"><label>Appointment Date</label><input type="text" id="rpt-date" placeholder="dd/mm/yyyy"></div>
+    </div>
+    <div class="frow">
+      <div class="ff"><label>Doctor / Specialist</label><input type="text" id="rpt-doctor" placeholder="Dr. ..."></div>
+      <div class="ff"><label>Reason for Visit</label><input type="text" id="rpt-reason" placeholder="Pain review / follow-up"></div>
+    </div>
+    <div class="ff" style="margin-bottom:10px">
+      <label>My Main Concerns for This Visit</label>
+      <textarea id="rpt-concerns" rows="3" placeholder="What I most want to discuss today..."></textarea>
+    </div>
+    <button class="btn btn-gold" onclick="generateReport()" style="width:100%">📋 Generate Doctor Report</button>
+  </div>
+
+  <div id="report-preview" style="display:none"></div>
+</div>
+
+</main>
+
+<!-- ── TOAST ── -->
+<div class="toast-wrap" id="toast"><div class="toast" id="toast-msg"></div></div>
+
+<!-- ── DEMO: Floating CTA ── -->
+<a class="demo-fab" href="#" id="demo-fab">Get Full Version</a>
+
+<!-- ── DEMO: Limit Modal ── -->
+<div class="demo-modal-bg" id="demo-limit-modal">
+  <div class="demo-modal">
+    <h3>Demo Limit Reached</h3>
+    <p>You've explored the key features! The full Chronic Pain Journal includes unlimited logging, doctor reports, data export, and more.</p>
+    <a href="#" class="btn btn-pri" style="text-decoration:none;justify-content:center">Get the Full Chronic Pain Journal on Etsy</a>
+    <button class="btn btn-ghost" onclick="document.getElementById('demo-limit-modal').classList.remove('active')" style="width:100%">Continue Exploring</button>
+  </div>
+</div>
+
+<!-- ── DEMO: Doctor Block Modal ── -->
+<div class="demo-modal-bg" id="demo-doctor-modal">
+  <div class="demo-modal">
+    <h3>Available in Full Version</h3>
+    <p>The Doctor Report feature generates a printable summary of your pain data for medical appointments. It's available in the full version.</p>
+    <a href="#" class="btn btn-gold" style="text-decoration:none;justify-content:center">Get Full Version on Etsy</a>
+    <button class="btn btn-ghost" onclick="document.getElementById('demo-doctor-modal').classList.remove('active')" style="width:100%">Close</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── STATE ─────────────────────────────────────────────────────
+const KEY = 'pain_companion_v1';
+const NOW = new Date();
+const TODAY = NOW.toISOString().slice(0,10);
+
+let S = {
+  currentPain: 5,
+  spoons: 10,
+  spoonsUsed: 0,
+  logs: {},          // date → {pain, sleep, energy, mood, stress, areas, triggers, notes, meds, flare}
+  meds: [],
+  streak: 0,
+  lastLogDate: null,
+};
+
+const AREAS = [
+  'Head','Neck','Left Shoulder','Right Shoulder','Upper Back','Lower Back',
+  'Chest','Abdomen','Left Hip','Right Hip','Left Knee','Right Knee',
+  'Left Foot','Right Foot','Left Hand','Right Hand','Widespread'
+];
+
+const TRIGGERS = [
+  'Weather change','Overactivity','Poor sleep','Stress / anxiety',
+  'Hormonal','Food / diet','Dehydration','Screen time',
+  'Emotional strain','Travel','Cold temperature','Bright light',
+  'Standing too long','Unknown'
+];
+
+const PAIN_LABELS = ['','Minimal','Mild','Uncomfortable','Moderate','Distracting',
+  'Distressing','Intense','Severe','Unbearable','Worst possible'];
+const PAIN_DESCS  = ['','Barely noticeable','Present but manageable','Noticeable, affects tasks',
+  'Noticeably painful','Hard to focus','Affects all activities','Limits normal function',
+  'Debilitating pain','Near unable to function','Worst pain imaginable'];
+
+let selectedAreas = new Set();
+let selectedTrigs = new Set();
+let hmYear = NOW.getFullYear();
+let hmMonth = NOW.getMonth();
+
+// ── LOAD/SAVE (DEMO: no-ops) ─────────────────────────────────
+let _demoSaveCount = 0;
+const DEMO_MAX_SAVES = 3;
+function load(){}
+function save(){
+  _demoSaveCount++;
+  if(_demoSaveCount >= DEMO_MAX_SAVES){
+    document.getElementById('demo-limit-modal').classList.add('active');
+  }
+}
+
+// ── PAIN BAR ─────────────────────────────────────────────────
+function buildPainBar(){
+  const el=document.getElementById('pain-bar');
+  el.innerHTML='';
+  for(let i=1;i<=10;i++){
+    const s=document.createElement('div');
+    s.className=`pb-seg s${i}${i<=S.currentPain?' active':''}`;
+    s.style.height=i<=S.currentPain?`${i*3+10}px`:'10px';
+    s.onclick=()=>setPain(i);
+    el.appendChild(s);
+  }
+  document.getElementById('pain-display').textContent=S.currentPain;
+  document.getElementById('pain-label').textContent=PAIN_LABELS[S.currentPain]||'';
+  document.getElementById('pain-desc').textContent=PAIN_DESCS[S.currentPain]||'';
+}
+function setPain(v){S.currentPain=v;buildPainBar();}
+
+// ── SLIDERS ──────────────────────────────────────────────────
+function updateSlider(inp,id,varName){
+  const v=document.getElementById(id);
+  v.textContent=inp.value;
+  v.style.color=`var(--${varName})`;
+}
+
+// ── SPOONS ───────────────────────────────────────────────────
+function buildSpoons(){
+  const el=document.getElementById('spoon-grid');
+  el.innerHTML='';
+  for(let i=0;i<S.spoons+S.spoonsUsed;i++){
+    const sp=document.createElement('div');
+    sp.className=`spoon${i>=S.spoons?' used':''}`;
+    sp.textContent='🥄';
+    sp.onclick=()=>toggleSpoon(i);
+    el.appendChild(sp);
+  }
+  document.getElementById('spoons-available').textContent=S.spoons;
+  document.getElementById('spoons-used').textContent=S.spoonsUsed;
+  document.getElementById('spoon-display').textContent=S.spoons;
+  document.getElementById('spoons-left').textContent=S.spoons;
+}
+function toggleSpoon(i){
+  const total=S.spoons+S.spoonsUsed;
+  if(i<S.spoons){S.spoons--;S.spoonsUsed++;}
+  else{S.spoons++;S.spoonsUsed--;}
+  buildSpoons();
+}
+
+// ── AREA GRID ────────────────────────────────────────────────
+function buildAreaGrid(){
+  const el=document.getElementById('area-grid');
+  el.innerHTML=AREAS.map(a=>
+    `<div class="area-chip${selectedAreas.has(a)?' active':''}" onclick="toggleArea('${a}')">${a}</div>`
+  ).join('');
+}
+function toggleArea(a){
+  if(selectedAreas.has(a))selectedAreas.delete(a);
+  else selectedAreas.add(a);
+  buildAreaGrid();
+}
+
+// ── TRIGGER GRID ─────────────────────────────────────────────
+function buildTrigGrid(){
+  const el=document.getElementById('trig-grid');
+  el.innerHTML=TRIGGERS.map(t=>
+    `<div class="trig-chip${selectedTrigs.has(t)?' active':''}" onclick="toggleTrig('${t}')">${t}</div>`
+  ).join('');
+}
+function toggleTrig(t){
+  if(selectedTrigs.has(t))selectedTrigs.delete(t);
+  else selectedTrigs.add(t);
+  buildTrigGrid();
+}
+
+// ── LOG ──────────────────────────────────────────────────────
+function saveLog(){
+  const log={
+    pain:S.currentPain,
+    sleep:+document.getElementById('sl-sleep').value,
+    energy:+document.getElementById('sl-energy').value,
+    mood:+document.getElementById('sl-mood').value,
+    stress:+document.getElementById('sl-stress').value,
+    areas:[...selectedAreas],
+    triggers:[...selectedTrigs],
+    notes:document.getElementById('log-notes').value,
+    spoons:S.spoons,
+    spoonsUsed:S.spoonsUsed,
+    flare:false,
+    ts:Date.now()
+  };
+  S.logs[TODAY]=log;
+  checkStreak();
+  save();
+  renderRecentLogs();
+  renderInsights();
+  renderHeatMap();
+  showToast('✓ Pain log saved');
+}
+
+function clearToday(){
+  selectedAreas.clear();selectedTrigs.clear();
+  buildAreaGrid();buildTrigGrid();
+  document.getElementById('log-notes').value='';
+}
+
+function logFlare(){
+  if(S.logs[TODAY])S.logs[TODAY].flare=true;
+  else S.logs[TODAY]={pain:S.currentPain,flare:true,ts:Date.now()};
+  save();renderHeatMap();showToast('Flare logged');
+}
+
+function renderRecentLogs(){
+  const el=document.getElementById('recent-logs');
+  const dates=Object.keys(S.logs).sort((a,b)=>b.localeCompare(a)).slice(0,7);
+  if(!dates.length){el.innerHTML='<div class="empty">No logs yet.<br>Log your first day above.</div>';return;}
+  el.innerHTML=dates.map(d=>{
+    const l=S.logs[d];
+    const painCol=l.pain<=3?'var(--gr)':l.pain<=6?'var(--am)':'var(--rd)';
+    return `<div class="log-item">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:${painCol}">${l.pain||'—'}</div>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink)">${d===TODAY?'Today':d}</div>
+          <div style="font-size:10px;color:var(--ink4)">${l.flare?'🚨 Flare ':''}😴${l.sleep||'?'}h ⚡${l.energy||'?'}/10 😟${l.mood||'?'}/10</div>
+        </div>
+        ${l.flare?'<div style="margin-left:auto;padding:3px 10px;border-radius:12px;background:var(--rd-s);border:1px solid var(--rd);font-size:9px;font-weight:600;color:var(--rd)">FLARE</div>':''}
+      </div>
+      ${l.areas&&l.areas.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${l.areas.map(a=>`<span style="font-size:9px;padding:2px 8px;border-radius:12px;background:var(--rd-s);color:var(--rd);border:1px solid rgba(184,84,84,.2)">${a}</span>`).join('')}</div>`:''}
+      ${l.notes?`<div style="font-size:11px;color:var(--ink3);margin-top:6px;font-style:italic">${l.notes.slice(0,80)}${l.notes.length>80?'…':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── STREAK ───────────────────────────────────────────────────
+function checkStreak(){
+  const yst=new Date(NOW);yst.setDate(yst.getDate()-1);
+  const yStr=yst.toISOString().slice(0,10);
+  if(S.lastLogDate===yStr)S.streak++;
+  else if(S.lastLogDate!==TODAY)S.streak=1;
+  S.lastLogDate=TODAY;
+  document.getElementById('streak-num').textContent=S.streak;
+}
+
+// ── HEAT MAP ─────────────────────────────────────────────────
+function changeMonth(dir){
+  hmMonth+=dir;
+  if(hmMonth<0){hmMonth=11;hmYear--;}
+  if(hmMonth>11){hmMonth=0;hmYear++;}
+  renderHeatMap();
+}
+
+function renderHeatMap(){
+  const months=['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  document.getElementById('hm-month-label').textContent=`${months[hmMonth]} ${hmYear}`;
+
+  const firstDay=new Date(hmYear,hmMonth,1).getDay();
+  const offset=(firstDay===0?6:firstDay-1);
+  const daysInMonth=new Date(hmYear,hmMonth+1,0).getDate();
+
+  const el=document.getElementById('hm-grid');
+  el.innerHTML='';
+
+  let good=0,mod=0,bad=0,flares=0,total=0,count=0;
+
+  for(let i=0;i<offset;i++){
+    const empty=document.createElement('div');empty.style.height='0';el.appendChild(empty);
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${hmYear}-${String(hmMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const log=S.logs[dateStr];
+    const cell=document.createElement('div');
+    cell.className='hm-day';
+    cell.title=dateStr;
+    const isToday=dateStr===TODAY;
+    if(isToday)cell.style.fontWeight='700';
+
+    if(log){
+      const p=log.pain;
+      const cl=p<=3?'p1':p<=6?'p2':'p3';
+      cell.classList.add(cl);
+      if(log.flare)cell.classList.add('flare');
+      cell.innerHTML=`<div class="hm-val">${p}</div><div class="hm-n">${d}</div>`;
+      if(p<=3)good++;else if(p<=6)mod++;else bad++;
+      if(log.flare)flares++;
+      total+=p;count++;
+    }else{
+      cell.classList.add('p0');
+      cell.innerHTML=`<div class="hm-n" style="font-size:10px">${d}</div>`;
+    }
+    el.appendChild(cell);
+  }
+
+  document.getElementById('hm-good').textContent=good;
+  document.getElementById('hm-mod').textContent=mod;
+  document.getElementById('hm-bad').textContent=bad;
+  document.getElementById('hm-flares').textContent=flares;
+  document.getElementById('hm-avg').textContent=count?(total/count).toFixed(1):'--';
+}
+
+// ── MEDS ─────────────────────────────────────────────────────
+function addMed(){
+  const name=document.getElementById('med-name').value.trim();
+  const time=document.getElementById('med-time').value.trim();
+  const type=document.getElementById('med-type').value;
+  if(!name)return;
+  S.meds.push({id:Date.now()+'',name,time,type,takenDates:[]});
+  save();document.getElementById('med-name').value='';renderMeds();
+}
+function renderMeds(){
+  const el=document.getElementById('med-list');
+  if(!S.meds.length){
+    el.innerHTML='<div class="insight gr"><div class="ii">💊</div><div>No medications added. Use the form below to add your daily medications.</div></div>';return;
+  }
+  el.innerHTML=S.meds.map(m=>{
+    const taken=m.takenDates&&m.takenDates.includes(TODAY);
+    return `<div class="med-item${taken?' taken':''}" onclick="toggleMed('${m.id}')">
+      <div class="med-dot">${taken?'✓':''}</div>
+      <div>
+        <div class="med-name">${m.name}</div>
+        <div class="med-time">${m.time}${m.time?' · ':''}${m.type}</div>
+      </div>
+      <button class="btn-del" onclick="event.stopPropagation();deleteMed('${m.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+function toggleMed(id){
+  const m=S.meds.find(x=>x.id===id);if(!m)return;
+  if(!m.takenDates)m.takenDates=[];
+  if(m.takenDates.includes(TODAY))m.takenDates=m.takenDates.filter(d=>d!==TODAY);
+  else{m.takenDates.push(TODAY);showToast(`💊 ${m.name} logged`);}
+  save();renderMeds();
+}
+function deleteMed(id){S.meds=S.meds.filter(m=>m.id!==id);save();renderMeds();}
+function saveMedNotes(){
+  const n=document.getElementById('med-notes').value;
+  if(S.logs[TODAY])S.logs[TODAY].medNotes=n;
+  save();showToast('Med notes saved');
+}
+
+// ── INSIGHTS ─────────────────────────────────────────────────
+function renderInsights(){
+  const logs=Object.entries(S.logs).sort(([a],[b])=>a.localeCompare(b));
+  const recent=logs.slice(-14);
+  const last30=logs.slice(-30);
+
+  // Stats
+  const avgPain=last30.length?
+    (last30.reduce((s,[,l])=>s+(l.pain||0),0)/last30.length).toFixed(1):'--';
+  const bestDay=last30.reduce((best,[d,l])=>(l.pain&&(!best||l.pain<best.pain))?l:{...best,date:d},null);
+  const flares=last30.filter(([,l])=>l.flare).length;
+
+  document.getElementById('is-avg').textContent=avgPain;
+  document.getElementById('is-streak').textContent=S.streak;
+  document.getElementById('is-best').textContent=bestDay?.pain||'--';
+  document.getElementById('is-flares').textContent=flares;
+
+  // Trend chart
+  const chart=document.getElementById('trend-chart');
+  chart.innerHTML='';
+  const maxP=10;
+  recent.forEach(([d,l])=>{
+    const bar=document.createElement('div');
+    const p=l.pain||0;
+    const pct=(p/maxP)*100;
+    const col=p<=3?'var(--gr)':p<=6?'var(--am)':'var(--rd)';
+    bar.className='mc-bar';
+    bar.style.height=`${pct}%`;
+    bar.style.background=col;
+    bar.style.opacity=l.flare?1:.75;
+    bar.setAttribute('data-val',`${d.slice(5)}: ${p}/10${l.flare?' 🚨':''}`);
+    chart.appendChild(bar);
+  });
+  if(recent.length){
+    document.getElementById('trend-start').textContent=recent[0][0].slice(5);
+  }
+
+  // Insight cards
+  const insightEl=document.getElementById('insight-cards');
+  const tips=[];
+  const numericAvg=parseFloat(avgPain)||0;
+  if(numericAvg>6)tips.push({t:'rd',i:'🔴',msg:`<b>Your 30-day average is ${avgPain}/10.</b> This is in the severe range. Consider requesting an urgent review with your pain specialist. Bring your heat map.`});
+  else if(numericAvg>4)tips.push({t:'gold',i:'🟡',msg:`<b>30-day average: ${avgPain}/10.</b> Moderate range. Your logs are building a picture your doctor needs to see.`});
+  else if(numericAvg>0)tips.push({t:'gr',i:'🟢',msg:`<b>30-day average: ${avgPain}/10.</b> You're in the mild range. Keep logging to identify what's working.`});
+  if(flares>3)tips.push({t:'acc',i:'🌊',msg:`<b>${flares} flares this month.</b> High frequency. Track what preceded each flare — the pattern could reveal an avoidable trigger.`});
+  if(S.streak>=7)tips.push({t:'gold',i:'🔥',msg:`<b>${S.streak}-day logging streak!</b> Consistent data is your most powerful tool. Your doctor can now see real patterns.`});
+  if(!tips.length&&logs.length)tips.push({t:'pri',i:'📊',msg:`Keep logging daily. Patterns emerge after 14+ consecutive days. You're building valuable medical data.`});
+  insightEl.innerHTML=tips.map(t=>`<div class="insight ${t.t}"><div class="ii">${t.i}</div><div>${t.msg}</div></div>`).join('');
+
+  // Trigger analysis
+  const trigCount={};
+  last30.forEach(([,l])=>(l.triggers||[]).forEach(t=>{trigCount[t]=(trigCount[t]||0)+1;}));
+  const sorted=Object.entries(trigCount).sort(([,a],[,b])=>b-a).slice(0,5);
+  const trigEl=document.getElementById('trigger-analysis');
+  if(sorted.length){
+    trigEl.innerHTML=sorted.map(([t,c])=>{
+      const pct=Math.round(c/last30.length*100);
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="flex:1;font-size:11px;font-weight:500;color:var(--ink2)">${t}</div>
+        <div style="width:180px;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--acc);border-radius:3px"></div>
+        </div>
+        <div style="font-size:10px;color:var(--ink4);width:40px;text-align:right">${c}×</div>
+      </div>`;
+    }).join('');
+  }else{
+    trigEl.innerHTML='<div class="empty">Log triggers daily to see patterns here.</div>';
+  }
+
+  // Area analysis
+  const areaCount={};
+  last30.forEach(([,l])=>(l.areas||[]).forEach(a=>{areaCount[a]=(areaCount[a]||0)+1;}));
+  const sortedAreas=Object.entries(areaCount).sort(([,a],[,b])=>b-a).slice(0,6);
+  const areaEl=document.getElementById('area-analysis');
+  if(sortedAreas.length){
+    areaEl.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px">${
+      sortedAreas.map(([a,c])=>`<div style="padding:6px 14px;border-radius:20px;background:var(--rd-s);border:1.5px solid rgba(184,84,84,.2);font-size:11px;font-weight:500;color:var(--rd)">${a} <span style="color:var(--ink4);font-weight:400">(${c}×)</span></div>`).join('')
+    }</div>`;
+  }else{
+    areaEl.innerHTML='<div class="empty">Log pain areas to see this analysis.</div>';
+  }
+}
+
+// ── DOCTOR REPORT (DEMO: blocked) ────────────────────────────
+function generateReport(){
+  document.getElementById('demo-doctor-modal').classList.add('active');
+  return;
+  /* Full version code below: */
+  const name=document.getElementById('rpt-name').value||'Patient';
+  const date=document.getElementById('rpt-date').value||TODAY;
+  const doctor=document.getElementById('rpt-doctor').value||'Doctor';
+  const reason=document.getElementById('rpt-reason').value||'Pain review';
+  const concerns=document.getElementById('rpt-concerns').value;
+
+  const logs=Object.entries(S.logs).sort(([a],[b])=>a.localeCompare(b));
+  const last30=logs.slice(-30);
+  const avgPain=last30.length?(last30.reduce((s,[,l])=>s+(l.pain||0),0)/last30.length).toFixed(1):'N/A';
+  const bestPain=last30.reduce((b,[,l])=>l.pain&&l.pain<b?l.pain:b,10);
+  const worstPain=last30.reduce((b,[,l])=>l.pain&&l.pain>b?l.pain:b,0);
+  const flares=last30.filter(([,l])=>l.flare).length;
+  const goodDays=last30.filter(([,l])=>l.pain&&l.pain<=3).length;
+
+  const trigCount={};
+  last30.forEach(([,l])=>(l.triggers||[]).forEach(t=>{trigCount[t]=(trigCount[t]||0)+1;}));
+  const topTrigs=Object.entries(trigCount).sort(([,a],[,b])=>b-a).slice(0,4).map(([t,c])=>`${t} (${c}×)`).join(', ')||'None recorded';
+
+  const areaCount={};
+  last30.forEach(([,l])=>(l.areas||[]).forEach(a=>{areaCount[a]=(areaCount[a]||0)+1;}));
+  const topAreas=Object.entries(areaCount).sort(([,a],[,b])=>b-a).slice(0,4).map(([a,c])=>`${a} (${c}×)`).join(', ')||'None recorded';
+
+  const currentMeds=S.meds.map(m=>`${m.name}${m.time?' at '+m.time:''} (${m.type})`).join(', ')||'None recorded';
+
+  const rptEl=document.getElementById('report-preview');
+  rptEl.style.display='block';
+  rptEl.innerHTML=`
+    <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--sh);margin-top:14px">
+      <div style="border-bottom:2px solid var(--pri-dp);padding-bottom:14px;margin-bottom:18px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--pri-dp)">Pain Management Report</div>
+        <div style="font-size:10px;color:var(--ink4);margin-top:3px;letter-spacing:.1em;text-transform:uppercase">Generated by Pain Companion App · StudioBoubou</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;font-size:11px">
+        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Patient</div><div style="color:var(--ink);font-weight:500;margin-top:2px">${name}</div></div>
+        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Appointment</div><div style="color:var(--ink);font-weight:500;margin-top:2px">${date} — ${doctor}</div></div>
+        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Reason</div><div style="color:var(--ink);margin-top:2px">${reason}</div></div>
+        <div><div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)">Report Period</div><div style="color:var(--ink);margin-top:2px">Last 30 logged days</div></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:12px">Pain Statistics</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;text-align:center">
+        ${[['Average','avgPain',avgPain],['Best Day',null,bestPain+'/10'],['Worst Day',null,worstPain+'/10'],['Good Days',null,goodDays+' days']].map(([l,,v])=>`<div style="border:1px solid var(--line);border-radius:8px;padding:10px"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--pri-dp)">${v}</div><div style="font-size:8.5px;color:var(--ink4);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">${l}</div></div>`).join('')}
+      </div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Flares</div>
+      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${flares} flare episodes recorded in the report period.</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Top Reported Triggers</div>
+      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${topTrigs}</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Most Affected Areas</div>
+      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${topAreas}</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">Current Medications</div>
+      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">${currentMeds}</div>
+      ${concerns?`<div style="font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--pri-dp);border-bottom:1.5px solid var(--pri-l);padding-bottom:5px;margin-bottom:10px">My Main Concerns for This Visit</div><div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px;line-height:1.7">${concerns}</div>`:''}
+      <div style="margin-top:16px;padding:12px;background:var(--pri-s);border-radius:8px;font-size:10px;color:var(--ink3);line-height:1.7">This report was generated from ${Object.keys(S.logs).length} logged days using the Pain Companion app (StudioBoubou). Data is stored locally on this device and has not been shared with any third party.</div>
+    </div>
+    <div style="text-align:right;margin-top:10px">
+      <button class="btn btn-gold" onclick="window.print()">🖨 Print Report</button>
+    </div>
+  `;
+  showToast('📋 Report generated');
+}
+
+// ── TABS ─────────────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.nb').forEach(b=>{b.classList.remove('active','acc','gold','gr','rd');});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const btn=document.querySelector(`.nb[data-tab="${name}"]`);
+  btn.classList.add('active');
+  const col=btn.dataset.color;if(col)btn.classList.add(col);
+  document.getElementById(`panel-${name}`).classList.add('active');
+  if(name==='heatmap')renderHeatMap();
+  if(name==='insights')renderInsights();
+  if(name==='meds')renderMeds();
+}
+
+// ── FLARE ────────────────────────────────────────────────────
+function openFlare(){document.getElementById('flare-overlay').classList.add('active');}
+function closeFlare(){document.getElementById('flare-overlay').classList.remove('active');}
+
+// ── TOAST ────────────────────────────────────────────────────
+function showToast(msg){
+  const tw=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  tw.classList.add('show');setTimeout(()=>tw.classList.remove('show'),2800);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+function init(){
+  load();
+  const months=['January','February','March','April','May','June','July',
+    'August','September','October','November','December'];
+  document.getElementById('hdate').textContent=`${months[NOW.getMonth()]} ${NOW.getDate()}, ${NOW.getFullYear()}`;
+  document.getElementById('streak-num').textContent=S.streak;
+  buildPainBar();
+  buildSpoons();
+  buildAreaGrid();
+  buildTrigGrid();
+  renderMeds();
+  renderRecentLogs();
+  renderHeatMap();
+  renderInsights();
+
+  // Load today's log if exists
+  if(S.logs[TODAY]){
+    const l=S.logs[TODAY];
+    if(l.pain)setPain(l.pain);
+    if(l.sleep)document.getElementById('sl-sleep').value=l.sleep;
+    if(l.energy)document.getElementById('sl-energy').value=l.energy;
+    if(l.mood)document.getElementById('sl-mood').value=l.mood;
+    if(l.stress)document.getElementById('sl-stress').value=l.stress;
+    if(l.notes)document.getElementById('log-notes').value=l.notes;
+    if(l.areas)(l.areas).forEach(a=>selectedAreas.add(a));
+    if(l.triggers)(l.triggers).forEach(t=>selectedTrigs.add(t));
+    buildAreaGrid();buildTrigGrid();
+  }
+
+  document.querySelectorAll('.nb').forEach(btn=>{
+    btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+  });
+
+  // Update sliders display
+  ['sl-sleep','sl-energy','sl-mood','sl-stress'].forEach(id=>{
+    const inp=document.getElementById(id);
+    if(inp)inp.dispatchEvent(new Event('input'));
+  });
+}
+
+document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('contextmenu',function(e){e.preventDefault();});
+document.addEventListener('selectstart',function(e){if(e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'&&e.target.tagName!=='SELECT'){e.preventDefault();}});
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='u'){e.preventDefault();}if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='I'){e.preventDefault();}});
+setInterval(function(){var m=document.querySelector('.main');if(m&&m.style.display==='none'){m.style.display='';} var f=document.querySelector('.demo-fab');if(f&&f.style.display==='none'){f.style.display='';} var b=document.querySelector('.demo-badge');if(b&&b.style.display==='none'){b.style.display='';}},5000);
+</script>
+</body>
+</html>
